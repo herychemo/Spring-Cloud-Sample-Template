@@ -24,7 +24,7 @@ turbine:
     clusterConfig: OP-USERS-SAMPLE
   app-config: op-users-sample
   instanceUrlSuffix:
-    /op-users-sample/actuator/hystrix.stream
+    OP-USERS-SAMPLE: /op-users-sample/actuator/hystrix.stream
   combine-host-port: true
 
 
