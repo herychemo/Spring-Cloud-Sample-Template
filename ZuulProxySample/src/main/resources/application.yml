@@ -1,0 +1,28 @@
+
+info:
+  component: Zuul Server App
+
+server:
+  port: 9000
+
+spring:
+  application:
+    name: ZuulProxySample
+  config:
+    name: ZuulProxySample
+  cloud:
+    config:
+      enabled: true
+      uri: http://localhost:8888
+
+
+zuul:
+  routes:
+    microservices-op-users-sample:
+      path: /op-users-sample/**
+      serviceId: op-users-sample
+      stripPrefix: false
+
+error:
+  whitelabel:
+    enabled: false

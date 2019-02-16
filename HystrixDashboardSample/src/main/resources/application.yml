@@ -1,0 +1,38 @@
+
+server:
+  port: 9002
+
+spring:
+  application:
+    name: hystrixdashboardsample
+  config:
+    name: hystrixdashboardsample
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+
+
+turbine:
+  aggregator:
+    clusterConfig: OP-USERS-SAMPLE
+  app-config: op-users-sample
+  instanceUrlSuffix:
+    /op-users-sample/actuator/hystrix.stream
+  combine-host-port: true
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+    instance:
+      metadataMap:
+        instanceId: ${spring.application.name}:${server.port}
+    registerWithEureka: false
