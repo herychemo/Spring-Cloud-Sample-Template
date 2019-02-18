@@ -18,9 +18,9 @@ spring:
 
 zuul:
   routes:
-    microservices-op-users-sample:
-      path: /op-users-sample/**
-      serviceId: op-users-sample
+    microservices-users-ms-sample:
+      path: /users-ms-sample/**
+      serviceId: users-ms-sample
       stripPrefix: false
 
 error:

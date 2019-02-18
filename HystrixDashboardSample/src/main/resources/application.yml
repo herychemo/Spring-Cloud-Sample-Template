@@ -21,10 +21,10 @@ management:
 
 turbine:
   aggregator:
-    clusterConfig: OP-USERS-SAMPLE
-  app-config: op-users-sample
+    clusterConfig: USERS-MS-SAMPLE
+  app-config: users-ms-sample
   instanceUrlSuffix:
-    OP-USERS-SAMPLE: /op-users-sample/actuator/hystrix.stream
+    USERS-MS-SAMPLE: /users-ms-sample/actuator/hystrix.stream
   combine-host-port: true
 
 

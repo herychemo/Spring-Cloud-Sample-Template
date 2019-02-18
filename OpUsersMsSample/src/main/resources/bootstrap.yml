@@ -1,6 +1,0 @@
-spring:
-  application:
-    name: op-users-sample
-  cloud:
-    config:
-      uri: http://localhost:8888
