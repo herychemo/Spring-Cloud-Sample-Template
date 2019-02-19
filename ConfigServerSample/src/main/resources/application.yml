@@ -1,14 +1,15 @@
 
-
 server:
-  port: 8888
+  port: ${SERVER_PORT:8888}
 
 spring:
+  application:
+    name: ConfigServer
   cloud:
     config:
       server:
         git:
-          uri: https://github.com/herychemo/SampleConfigRepo.git
+          uri: ${GIT_REPO_URL:https://github.com/herychemo/SampleConfigRepo.git}
           #username: ${config_server_username}
           #password: ${config_server_password}
           skip-ssl-validation: true

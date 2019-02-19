@@ -1,8 +1,8 @@
 spring:
   application:
-    name: users-ms-sample
+    name: HystrixDashboard
   cloud:
     config:
       enabled: true
-      name: users-ms-sample
+      name: HystrixDashboard
       uri: http://localhost:8888

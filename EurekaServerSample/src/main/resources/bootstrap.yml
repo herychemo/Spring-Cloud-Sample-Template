@@ -1,8 +1,8 @@
 spring:
   application:
-    name: users-ms-sample
+    name: EurekaServer
   cloud:
     config:
       enabled: true
-      name: users-ms-sample
+      name: EurekaServer
       uri: http://localhost:8888

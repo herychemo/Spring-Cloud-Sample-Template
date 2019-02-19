@@ -1,8 +1,8 @@
 spring:
   application:
-    name: users-ms-sample
+    name: ZuulProxy
   cloud:
     config:
       enabled: true
-      name: users-ms-sample
+      name: ZuulProxy
       uri: http://localhost:8888
