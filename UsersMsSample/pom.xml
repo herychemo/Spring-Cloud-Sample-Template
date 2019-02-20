@@ -50,6 +50,11 @@
 
 
 		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-zipkin</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>com.grayraccoon</groupId>
 			<artifactId>web-utils</artifactId>
 			<version>0.1.0-SNAPSHOT</version>
