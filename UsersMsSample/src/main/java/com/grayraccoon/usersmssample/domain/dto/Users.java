@@ -1,6 +1,9 @@
 package com.grayraccoon.usersmssample.domain.dto;
 
-public class Users {
+import java.io.Serializable;
+
+
+public class Users implements Serializable {
 
     private String id;
 

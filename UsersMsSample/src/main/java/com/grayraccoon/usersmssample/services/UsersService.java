@@ -4,6 +4,7 @@ import com.grayraccoon.usersmssample.domain.dto.Users;
 import com.grayraccoon.webutils.errors.ApiError;
 import com.grayraccoon.webutils.errors.ApiValidationError;
 import com.grayraccoon.webutils.exceptions.CustomApiException;
+import org.apache.commons.lang.math.RandomUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,11 @@ public class UsersService {
     }
 
     public Users getUserById(String user_id) {
+
+        if (RandomUtils.nextBoolean() && RandomUtils.nextBoolean() && RandomUtils.nextBoolean()) {
+            throw new RuntimeException();
+        }
+
         Optional<Users> foundUser = this.allUsers.stream().filter(users -> users.getId().equals(user_id)).findFirst();
         if (foundUser.isPresent()) {
             return foundUser.get();
