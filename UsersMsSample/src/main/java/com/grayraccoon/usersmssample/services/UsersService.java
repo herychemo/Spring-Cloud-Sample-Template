@@ -5,6 +5,8 @@ import com.grayraccoon.webutils.errors.ApiError;
 import com.grayraccoon.webutils.errors.ApiValidationError;
 import com.grayraccoon.webutils.exceptions.CustomApiException;
 import org.apache.commons.lang.math.RandomUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,8 @@ import java.util.Optional;
 
 @Service
 public class UsersService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UsersService.class.getName());
 
     private List<Users> allUsers;
 
@@ -38,6 +42,7 @@ public class UsersService {
             return foundUser.get();
         }
 
+        LOGGER.info("User not found: {}", user_id);
         throw new CustomApiException(
                 ApiError.builder()
                         .status(HttpStatus.NOT_FOUND)
