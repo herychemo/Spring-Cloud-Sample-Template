@@ -10,9 +10,9 @@ SET row_security = off;
 
 /*	SCHEMA	*/
 
-DROP SCHEMA IF EXISTS oauth2 CASCADE;
+--DROP SCHEMA IF EXISTS oauth2 CASCADE;
 CREATE SCHEMA IF NOT EXISTS oauth2;
-ALTER SCHEMA oauth2 OWNER TO postgres;
+ALTER SCHEMA oauth2 OWNER TO dbo_admin;
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 SET search_path = oauth2, pg_catalog;
@@ -35,20 +35,20 @@ CREATE TABLE oauth2.users(
   createDateTime TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (current_timestamp),
   updateDateTime TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (current_timestamp)
 );
-ALTER TABLE oauth2.users OWNER TO postgres;
+ALTER TABLE oauth2.users OWNER TO dbo_admin;
 
 
 CREATE TABLE oauth2.roles(
   role_id INTEGER PRIMARY KEY,
   role VARCHAR(90) NOT NULL
 );
-ALTER TABLE oauth2.roles OWNER TO postgres;
+ALTER TABLE oauth2.roles OWNER TO dbo_admin;
 
 CREATE TABLE oauth2.user_role(
   user_id VARCHAR(42) NOT NULL REFERENCES  oauth2.users(user_id),
   role_id INTEGER NOT NULL REFERENCES  oauth2.roles(role_id)
 );
-ALTER TABLE oauth2.user_role OWNER TO postgres;
+ALTER TABLE oauth2.user_role OWNER TO dbo_admin;
 
 
 

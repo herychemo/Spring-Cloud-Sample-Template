@@ -9,6 +9,8 @@ case ${option} in
         docker run -p 5432:5432     \
             --name PostgresDatabaseSpringCloudSample   \
             -e POSTGRES_PASSWORD=rootroot   \
+            -e POSTGRES_USER=dbo_admin   \
+            -e POSTGRES_DB=cloud_db   \
             -d postgres:11.2
             #-v LOCAL_FOLDER:/var/libpostgresql/data  \
 
