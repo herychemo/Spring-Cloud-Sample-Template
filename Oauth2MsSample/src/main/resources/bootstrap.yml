@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: oauth2-ms-sample
+  cloud:
+    config:
+      enabled: true
+      name: oauth2-ms-sample
+      uri: http://localhost:8888
