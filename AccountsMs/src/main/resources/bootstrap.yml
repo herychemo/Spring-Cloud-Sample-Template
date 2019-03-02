@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: accounts-ms
+  cloud:
+    config:
+      enabled: true
+      name: accounts-ms
+      uri: http://localhost:8888

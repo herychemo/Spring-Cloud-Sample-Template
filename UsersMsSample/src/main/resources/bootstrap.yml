@@ -1,8 +1,0 @@
-spring:
-  application:
-    name: users-ms-sample
-  cloud:
-    config:
-      enabled: true
-      name: users-ms-sample
-      uri: http://localhost:8888

@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: auth-ms
+  cloud:
+    config:
+      enabled: true
+      name: auth-ms
+      uri: http://localhost:8888

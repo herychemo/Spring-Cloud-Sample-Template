@@ -7,7 +7,7 @@ case ${option} in
         docker pull postgres:11.2
 
         docker run -p 5432:5432     \
-            --name PostgresDatabaseSpringCloudSample   \
+            --name PostgresDatabase   \
             -e POSTGRES_PASSWORD=rootroot   \
             -e POSTGRES_USER=dbo_admin   \
             -e POSTGRES_DB=cloud_db   \
@@ -17,12 +17,12 @@ case ${option} in
     ;;
     stop)
         echo "Performing: stop"
-        docker stop PostgresDatabaseSpringCloudSample
-        docker rm PostgresDatabaseSpringCloudSample
+        docker stop PostgresDatabase
+        docker rm PostgresDatabase
     ;;
     log)
         echo "Performing: log"
-        docker logs -f PostgresDatabaseSpringCloudSample
+        docker logs -f PostgresDatabase
     ;;
     *)
         echo "Not Valid Option for: ${0}, use [start], [stop] or [log]"
