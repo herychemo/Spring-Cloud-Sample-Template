@@ -1,5 +1,6 @@
-package com.grayraccoon.sample.accountsms.controllers;
+package com.grayraccoon.sample.accountsms.ws;
 
+import com.grayraccoon.webutils.dto.GenericDto;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.apache.commons.lang.math.RandomUtils;
 import org.slf4j.Logger;
@@ -10,22 +11,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/hello")
-public class HelloController {
+public class HelloWebService {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(HelloController.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(HelloWebService.class.getName());
 
 	@HystrixCommand(fallbackMethod = "getHelloFallback", commandKey = "helloWorld", groupKey = "helloWorld")
 	@GetMapping()
-	public String getHello() {
+	public GenericDto<String> getHello() {
 		if (RandomUtils.nextBoolean() && RandomUtils.nextBoolean() && RandomUtils.nextBoolean()) {
 			throw new RuntimeException();
 		}
-		return "Hello From MicroService";
+		return GenericDto.<String>builder().data("Hello From MicroService").build();
 	}
 
-
-	public String getHelloFallback() {
-		return "fallback hello";
+	public GenericDto<String> getHelloFallback() {
+		return GenericDto.<String>builder().data("fallback hello").build();
 	}
 
 }

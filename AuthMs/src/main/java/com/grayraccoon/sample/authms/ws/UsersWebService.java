@@ -2,6 +2,7 @@ package com.grayraccoon.sample.authms.ws;
 
 import com.grayraccoon.sample.authms.data.postgres.domain.Users;
 import com.grayraccoon.sample.authms.services.UserService;
+import com.grayraccoon.webutils.dto.GenericDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -28,22 +29,25 @@ public class UsersWebService {
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/secured/users")
-    public List<Users> findAllUsers() {
-        return userService.findAllUsers();
+    public GenericDto<List<Users>> findAllUsers() {
+        final List<Users> users = userService.findAllUsers();
+        return GenericDto.<List<Users>>builder().data(users).build();
     }
 
     @GetMapping("/authenticated/users/me")
-    public Users findMe(OAuth2Authentication authentication) {
+    public GenericDto<Users> findMe(OAuth2Authentication authentication) {
         Map<String,Object> extraInfo = getExtraInfo(authentication);
         String userId = (String) extraInfo.get("userId");
 
-        return userService.findUserById(userId);
+        final Users user = userService.findUserById(userId);
+        return GenericDto.<Users>builder().data(user).build();
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/secured/users/{userId}")
-    public Users findUser(@PathVariable String userId) {
-        return userService.findUserById(userId);
+    public GenericDto<Users> findUser(@PathVariable String userId) {
+        final Users user = userService.findUserById(userId);
+        return GenericDto.<Users>builder().data(user).build();
     }
 
 

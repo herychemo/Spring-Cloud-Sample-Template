@@ -1,8 +1,9 @@
-package com.grayraccoon.sample.accountsms.controllers;
+package com.grayraccoon.sample.accountsms.ws;
 
 
 import com.grayraccoon.sample.accountsms.domain.dto.Accounts;
 import com.grayraccoon.sample.accountsms.services.AccountService;
+import com.grayraccoon.webutils.dto.GenericDto;
 import com.grayraccoon.webutils.errors.ApiError;
 import com.grayraccoon.webutils.exceptions.CustomApiException;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
@@ -18,9 +19,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/accounts")
-public class AccountsController {
+public class AccountsWebService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AccountsController.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountsWebService.class.getName());
 
     @Autowired
     private AccountService accountService;
@@ -30,9 +31,11 @@ public class AccountsController {
             groupKey = "Accounts",
             ignoreExceptions = CustomApiException.class)
     @GetMapping(consumes = "application/json", produces = "application/json")
-    public List<Accounts> getAccounts() {
+    public GenericDto<List<Accounts>> getAccounts() {
         LOGGER.info("getAccounts()");
-        return accountService.getAllAccounts();
+        List<Accounts> accounts = accountService.getAllAccounts();
+        LOGGER.info("{} accounts found.", accounts.size());
+        return GenericDto.<List<Accounts>>builder().data(accounts).build();
     }
 
     @HystrixCommand(fallbackMethod = "getAccountFallback",
@@ -40,19 +43,19 @@ public class AccountsController {
             groupKey = "Accounts",
             ignoreExceptions = CustomApiException.class)
     @GetMapping(value = "/{account_id}", consumes = "application/json", produces = "application/json")
-    public Accounts getAccount(@PathVariable String account_id) {
+    public GenericDto<Accounts> getAccount(@PathVariable String account_id) {
         LOGGER.info("getAccount() {}", account_id);
         Accounts account = accountService.getAccountById(account_id);
         LOGGER.info("Found Account {}", account);
-        return account;
+        return GenericDto.<Accounts>builder().data(account).build();
     }
 
-    public List<Accounts> getAccountsFallback(Throwable ex) {
+    public GenericDto<List<Accounts>> getAccountsFallback(Throwable ex) {
         LOGGER.error("getAccountsFallback", ex);
         throw new CustomApiException(ApiError.builder().ex(ex).build());
     }
 
-    public Accounts getAccountFallback(String id, Throwable ex) {
+    public GenericDto<Accounts> getAccountFallback(String id, Throwable ex) {
         LOGGER.error("getAccountFallback", ex);
         throw new CustomApiException(ApiError.builder().ex(ex).build());
     }
