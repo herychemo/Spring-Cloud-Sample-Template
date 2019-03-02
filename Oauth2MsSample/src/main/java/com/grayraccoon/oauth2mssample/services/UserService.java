@@ -13,20 +13,44 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class UserService {
 
     @Autowired
-    UsersRepository usersRepository;
+    private UsersRepository usersRepository;
 
+    public List<Users> findAllUsers() {
+        return usersRepository.findAll();
+    }
 
     public Users findUserById(String userId) {
-        return this.findUserById(UUID.fromString(userId));
+        try {
+            return this.findUserById(UUID.fromString(userId));
+        } catch (IllegalArgumentException ex) {
+            throw new CustomApiException(
+                    ApiError.builder()
+                            .ex(ex)
+                            .status(HttpStatus.BAD_REQUEST)
+                            .subError(new ApiValidationError(userId))
+                            .build()
+            );
+        }
     }
+
     public Users findUserById(UUID userId) {
-        return usersRepository.getOne(userId);
+        Optional<Users> usersOptional = usersRepository.findById(userId);
+        if (usersOptional.isPresent()) {
+            return usersOptional.get();
+        }
+        throw new CustomApiException(
+                ApiError.builder()
+                        .status(HttpStatus.NOT_FOUND)
+                        .subError(new ApiValidationError(userId))
+                        .build()
+        );
     }
 
     public Users findByUsernameOrEmail(String query) {
@@ -47,7 +71,6 @@ public class UserService {
 
         return u;
     }
-
 
     @Transactional(readOnly = true)
     public List<Roles> getRolesFor(UUID user_id) {
