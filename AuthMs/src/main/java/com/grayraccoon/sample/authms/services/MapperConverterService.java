@@ -21,7 +21,7 @@ public class MapperConverterService {
                 .username(user.getUsername())
                 .name(user.getName())
                 .lastName(user.getLastName())
-                .password(null)
+                .password(user.getPassword())
                 .createDateTime(user.getCreateDateTime())
                 .updateDateTime(user.getUpdateDateTime())
                 .rolesCollection(
