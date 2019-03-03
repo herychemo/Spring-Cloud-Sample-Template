@@ -1,8 +1,8 @@
 package com.grayraccoon.sample.authms.services;
 
-import com.grayraccoon.sample.authms.data.postgres.domain.Roles;
 import com.grayraccoon.sample.authms.data.postgres.domain.Users;
 import com.grayraccoon.sample.authms.data.postgres.repository.UsersRepository;
+import com.grayraccoon.sample.authms.domain.dto.UsersDto;
 import com.grayraccoon.webutils.errors.ApiError;
 import com.grayraccoon.webutils.errors.ApiValidationError;
 import com.grayraccoon.webutils.exceptions.CustomApiException;
@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,13 +19,19 @@ import java.util.UUID;
 public class UserService {
 
     @Autowired
+    private MapperConverterService mapperConverterService;
+
+    @Autowired
     private UsersRepository usersRepository;
 
-    public List<Users> findAllUsers() {
-        return usersRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<UsersDto> findAllUsers() {
+        List<Users> users = usersRepository.findAll();
+        return this.mapperConverterService.createUsersDtoListFromUsersList(users);
     }
 
-    public Users findUserById(String userId) {
+    @Transactional(readOnly = true)
+    public UsersDto findUserById(String userId) {
         try {
             return this.findUserById(UUID.fromString(userId));
         } catch (IllegalArgumentException ex) {
@@ -40,10 +45,12 @@ public class UserService {
         }
     }
 
-    public Users findUserById(UUID userId) {
+    @Transactional(readOnly = true)
+    public UsersDto findUserById(UUID userId) {
         Optional<Users> usersOptional = usersRepository.findById(userId);
         if (usersOptional.isPresent()) {
-            return usersOptional.get();
+            Users user = usersOptional.get();
+            return this.mapperConverterService.createUsersDtoFromUser(user);
         }
         throw new CustomApiException(
                 ApiError.builder()
@@ -53,13 +60,9 @@ public class UserService {
         );
     }
 
-    public Users findByUsernameOrEmail(String query) {
-        Users u;
-        u = usersRepository.findByUsername(query);
-        if (u == null) {
-            u = usersRepository.findByEmail(query);
-        }
-
+    @Transactional(readOnly = true)
+    public UsersDto findUserByUsernameOrEmail(String query) {
+        Users u = usersRepository.findFirstByEmailOrUsername(query, query);
         if (u == null) {
             throw new CustomApiException(
                     ApiError.builder()
@@ -68,16 +71,7 @@ public class UserService {
                             .build()
             );
         }
-
-        return u;
-    }
-
-    @Transactional(readOnly = true)
-    public List<Roles> getRolesFor(UUID user_id) {
-        Users u = usersRepository.findByUserId(user_id);
-        return (u == null) ?
-                new ArrayList<>() :
-                new ArrayList<>(u.getRolesCollection());
+        return this.mapperConverterService.createUsersDtoFromUser(u);
     }
 
 }

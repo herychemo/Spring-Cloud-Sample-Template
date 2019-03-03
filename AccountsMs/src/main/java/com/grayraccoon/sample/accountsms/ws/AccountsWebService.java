@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping("/accounts")
 public class AccountsWebService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AccountsWebService.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountsWebService.class);
 
     @Autowired
     private AccountService accountService;
@@ -38,6 +38,12 @@ public class AccountsWebService {
         return GenericDto.<List<Accounts>>builder().data(accounts).build();
     }
 
+    public GenericDto<List<Accounts>> getAccountsFallback(Throwable ex) {
+        LOGGER.error("getAccountsFallback", ex);
+        throw new CustomApiException(ApiError.builder().ex(ex).build());
+    }
+
+
     @HystrixCommand(fallbackMethod = "getAccountFallback",
             commandKey = "GetAccount",
             groupKey = "Accounts",
@@ -46,13 +52,8 @@ public class AccountsWebService {
     public GenericDto<Accounts> getAccount(@PathVariable String account_id) {
         LOGGER.info("getAccount() {}", account_id);
         Accounts account = accountService.getAccountById(account_id);
-        LOGGER.info("Found Account {}", account);
+        LOGGER.info("Account {} Found: {}", account_id, account);
         return GenericDto.<Accounts>builder().data(account).build();
-    }
-
-    public GenericDto<List<Accounts>> getAccountsFallback(Throwable ex) {
-        LOGGER.error("getAccountsFallback", ex);
-        throw new CustomApiException(ApiError.builder().ex(ex).build());
     }
 
     public GenericDto<Accounts> getAccountFallback(String id, Throwable ex) {
