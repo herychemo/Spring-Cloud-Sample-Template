@@ -11,9 +11,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(catalog = "cloud_db", schema = "auth")
+@Table(name = "Roles", catalog = "cloud_db", schema = "auth")
 @NamedQueries({
-        @NamedQuery(name = "Roles.findAll", query = "SELECT r FROM Roles r")})
+        @NamedQuery(name = "RolesEntity.findAll", query = "SELECT r FROM RolesEntity r")})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

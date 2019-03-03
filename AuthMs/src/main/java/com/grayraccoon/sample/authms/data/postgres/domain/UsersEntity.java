@@ -13,12 +13,12 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(catalog = "cloud_db", schema = "auth", uniqueConstraints = {
+@Table(name = "Users", catalog = "cloud_db", schema = "auth", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"email"})
         , @UniqueConstraint(columnNames = {"username"})
 })
 @NamedQueries({
-        @NamedQuery(name = "Users.findAll", query = "SELECT u FROM Users u")})
+        @NamedQuery(name = "UsersEntity.findAll", query = "SELECT u FROM UsersEntity u")})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

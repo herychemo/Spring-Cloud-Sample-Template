@@ -9,6 +9,8 @@ import com.grayraccoon.sample.authms.domain.Users;
 import com.grayraccoon.webutils.errors.ApiError;
 import com.grayraccoon.webutils.errors.ApiValidationError;
 import com.grayraccoon.webutils.exceptions.CustomApiException;
+import com.grayraccoon.webutils.services.CustomValidatorService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +36,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RolesRepository rolesRepository;
+
+    @Autowired
+    private CustomValidatorService customValidatorService;
+
 
     @Transactional(readOnly = true)
     @Override
@@ -96,7 +102,10 @@ public class UserServiceImpl implements UserService {
             throw new CustomApiException(
                     ApiError.builder()
                             .status(HttpStatus.BAD_REQUEST)
-                            .subError(new ApiValidationError("userId", users.getUserId().toString(), "New user must not send userId."))
+                            .subError(new ApiValidationError(
+                                    "userId",
+                                    users.getUserId().toString(),
+                                    "New user must not send userId."))
                             .build()
             );
         }
@@ -134,13 +143,7 @@ public class UserServiceImpl implements UserService {
 
         UsersEntity user2save = mapperConverterService.createUsersEntityFromUser(users);
 
-        if (user2save.getRolesCollection() == null) {
-            throw new CustomApiException(
-                    ApiError.builder()
-                            .message("User must have at least one role.")
-                            .build()
-            );
-        }
+        this.validateUsersEntity(user2save);
 
         for (RolesEntity role: user2save.getRolesCollection()) {
             role.addUser(user2save);
@@ -150,6 +153,55 @@ public class UserServiceImpl implements UserService {
         Users savedUser = mapperConverterService.createUserFromUsersEntity(user2save);
 
         return savedUser;
+    }
+
+    @Override
+    public void validateUsersEntity(UsersEntity usersEntity) {
+        Set<ApiValidationError> errors = new HashSet<>();
+
+        if (usersEntity.getRolesCollection() == null) {
+            errors.add(new ApiValidationError(
+                    "roles",
+                    null,
+                    "User must have at least one role."));
+        }
+
+        errors.addAll(
+                customValidatorService.validateObject(usersEntity)
+        );
+
+        if (StringUtils.isNotBlank(usersEntity.getEmail())
+                && !isValidEmailCombination(usersEntity.getEmail(), usersEntity.getUserId())) {
+            errors.add(new ApiValidationError(
+                    "email",
+                    usersEntity.getEmail(),
+                    "Email not unique."));
+        }
+
+        if (StringUtils.isNotBlank(usersEntity.getUsername())
+                && !isValidUsernameCombination(usersEntity.getUsername(), usersEntity.getUserId())) {
+            errors.add(new ApiValidationError(
+                    "username",
+                    usersEntity.getUsername(),
+                    "Username not unique."));
+        }
+
+        if (!errors.isEmpty()) {
+            ApiError apiError = customValidatorService.getApiErrorFromApiValidationErrors(errors);
+            throw new CustomApiException(apiError);
+        }
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
+    @Override
+    public boolean isValidEmailCombination(String email, UUID userId) {
+        return usersRepository.isValidEmailCombination(email, userId);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
+    @Override
+    public boolean isValidUsernameCombination(String username, UUID userId) {
+        return usersRepository.isValidUsernameCombination(username, userId);
     }
 
 

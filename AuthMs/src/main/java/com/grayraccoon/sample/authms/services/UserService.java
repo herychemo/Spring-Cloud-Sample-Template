@@ -1,5 +1,6 @@
 package com.grayraccoon.sample.authms.services;
 
+import com.grayraccoon.sample.authms.data.postgres.domain.UsersEntity;
 import com.grayraccoon.sample.authms.domain.Users;
 
 import java.util.List;
@@ -13,5 +14,10 @@ public interface UserService {
     Users findUserByUsernameOrEmail(String query);
     Users createUser(Users users);
     Users saveUser(Users users);
+
+    void validateUsersEntity(UsersEntity usersEntity);
+
+    boolean isValidEmailCombination(String email, UUID userId);
+    boolean isValidUsernameCombination(String username, UUID userId);
 
 }
