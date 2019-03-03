@@ -1,7 +1,7 @@
 package com.grayraccoon.sample.accountsms.ws;
 
 
-import com.grayraccoon.sample.accountsms.domain.dto.Accounts;
+import com.grayraccoon.sample.accountsms.domain.Accounts;
 import com.grayraccoon.sample.accountsms.services.AccountService;
 import com.grayraccoon.webutils.dto.GenericDto;
 import com.grayraccoon.webutils.errors.ApiError;

@@ -1,20 +1,20 @@
 package com.grayraccoon.sample.authms.data.postgres.repository;
 
-import com.grayraccoon.sample.authms.data.postgres.domain.Users;
+import com.grayraccoon.sample.authms.data.postgres.domain.UsersEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
 @Repository
-public interface UsersRepository extends JpaRepository<Users, UUID> {
+public interface UsersRepository extends JpaRepository<UsersEntity, UUID> {
 
-    Users findByUsername(String username);
+    UsersEntity findByUsername(String username);
 
-    Users findByEmail(String email);
+    UsersEntity findByEmail(String email);
 
-    Users findByUserId(UUID userId);
+    UsersEntity findByUserId(UUID userId);
 
-    Users findFirstByEmailOrUsername(String email, String username);
+    UsersEntity findFirstByEmailOrUsername(String email, String username);
 
 }

@@ -1,9 +1,9 @@
 package com.grayraccoon.sample.authms.services;
 
-import com.grayraccoon.sample.authms.data.postgres.domain.Roles;
-import com.grayraccoon.sample.authms.data.postgres.domain.Users;
-import com.grayraccoon.sample.authms.domain.dto.RolesDto;
-import com.grayraccoon.sample.authms.domain.dto.UsersDto;
+import com.grayraccoon.sample.authms.data.postgres.domain.RolesEntity;
+import com.grayraccoon.sample.authms.data.postgres.domain.UsersEntity;
+import com.grayraccoon.sample.authms.domain.Roles;
+import com.grayraccoon.sample.authms.domain.Users;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 public class MapperConverterServiceImpl implements MapperConverterService {
 
     @Override
-    public UsersDto createUsersDtoFromUser(Users user) {
-        return UsersDto.builder()
+    public Users createUsersDtoFromUser(UsersEntity user) {
+        return Users.builder()
                 .userId(user.getUserId())
                 .active(user.isActive())
                 .email(user.getEmail())
@@ -32,27 +32,27 @@ public class MapperConverterServiceImpl implements MapperConverterService {
     }
 
     @Override
-    public List<UsersDto> createUsersDtoListFromUsersList(List<Users> usersList) {
-        return usersList.stream().map(this::createUsersDtoFromUser).collect(Collectors.toList());
+    public List<Users> createUsersDtoListFromUsersList(List<UsersEntity> usersEntityList) {
+        return usersEntityList.stream().map(this::createUsersDtoFromUser).collect(Collectors.toList());
     }
 
     @Override
-    public RolesDto createRolesDtoFromRole(Roles role) {
-        return RolesDto.builder()
+    public Roles createRolesDtoFromRole(RolesEntity role) {
+        return Roles.builder()
                 .roleId(role.getRoleId())
                 .role(role.getRole())
                 .build();
     }
 
     @Override
-    public Collection<RolesDto> createRolesDtoCollectionFromRolesCollection(Collection<Roles> roles) {
+    public Collection<Roles> createRolesDtoCollectionFromRolesCollection(Collection<RolesEntity> roles) {
         return roles.stream().map(this::createRolesDtoFromRole).collect(Collectors.toList());
     }
 
 
     @Override
-    public Users createUserFromUsersDto(UsersDto user) {
-        return Users.builder()
+    public UsersEntity createUserFromUsersDto(Users user) {
+        return UsersEntity.builder()
                 .userId(user.getUserId())
                 .active(user.isActive())
                 .email(user.getEmail())
@@ -68,15 +68,15 @@ public class MapperConverterServiceImpl implements MapperConverterService {
     }
 
     @Override
-    public Roles createRoleFromRolesDto(RolesDto role) {
-        return Roles.builder()
+    public RolesEntity createRoleFromRolesDto(Roles role) {
+        return RolesEntity.builder()
                 .roleId(role.getRoleId())
                 .role(role.getRole())
                 .build();
     }
 
     @Override
-    public Set<Roles> createRolesCollectionFromRolesDtoCollection(Collection<RolesDto> roles) {
+    public Set<RolesEntity> createRolesCollectionFromRolesDtoCollection(Collection<Roles> roles) {
         return roles.stream().map(this::createRoleFromRolesDto).collect(Collectors.toSet());
     }
 

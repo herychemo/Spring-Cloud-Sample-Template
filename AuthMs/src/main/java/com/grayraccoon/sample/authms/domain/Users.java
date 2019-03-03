@@ -1,4 +1,4 @@
-package com.grayraccoon.sample.authms.domain.dto;
+package com.grayraccoon.sample.authms.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @ToString
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class UsersDto implements Serializable {
+public class Users implements Serializable {
 
     private UUID userId;
     private boolean active;
@@ -30,9 +30,9 @@ public class UsersDto implements Serializable {
 
     private LocalDateTime createDateTime;
     private LocalDateTime updateDateTime;
-    @Singular("role") private Collection<RolesDto> rolesCollection;
+    @Singular("role") private Collection<Roles> rolesCollection;
 
-    public UsersDto(final UsersDto user) {
+    public Users(final Users user) {
         this.userId = user.userId;
         this.active = user.active;
         this.email = user.email;

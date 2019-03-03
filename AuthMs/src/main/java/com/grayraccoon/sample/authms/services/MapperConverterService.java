@@ -1,24 +1,24 @@
 package com.grayraccoon.sample.authms.services;
 
-import com.grayraccoon.sample.authms.data.postgres.domain.Roles;
-import com.grayraccoon.sample.authms.data.postgres.domain.Users;
-import com.grayraccoon.sample.authms.domain.dto.RolesDto;
-import com.grayraccoon.sample.authms.domain.dto.UsersDto;
+import com.grayraccoon.sample.authms.data.postgres.domain.RolesEntity;
+import com.grayraccoon.sample.authms.data.postgres.domain.UsersEntity;
+import com.grayraccoon.sample.authms.domain.Roles;
+import com.grayraccoon.sample.authms.domain.Users;
 
 import java.util.Collection;
 import java.util.List;
 
 public interface MapperConverterService {
 
-    UsersDto createUsersDtoFromUser(Users user);
-    List<UsersDto> createUsersDtoListFromUsersList(List<Users> usersList);
+    Users createUsersDtoFromUser(UsersEntity user);
+    List<Users> createUsersDtoListFromUsersList(List<UsersEntity> usersEntityList);
 
-    RolesDto createRolesDtoFromRole(Roles role);
-    Collection<RolesDto> createRolesDtoCollectionFromRolesCollection(Collection<Roles> roles);
+    Roles createRolesDtoFromRole(RolesEntity role);
+    Collection<Roles> createRolesDtoCollectionFromRolesCollection(Collection<RolesEntity> roles);
 
-    Users createUserFromUsersDto(UsersDto user);
+    UsersEntity createUserFromUsersDto(Users user);
 
-    Roles createRoleFromRolesDto(RolesDto role);
-    Collection<Roles> createRolesCollectionFromRolesDtoCollection(Collection<RolesDto> roles);
+    RolesEntity createRoleFromRolesDto(Roles role);
+    Collection<RolesEntity> createRolesCollectionFromRolesDtoCollection(Collection<Roles> roles);
 
 }

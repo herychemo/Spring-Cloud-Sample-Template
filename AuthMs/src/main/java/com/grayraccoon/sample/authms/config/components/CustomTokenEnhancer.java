@@ -1,6 +1,6 @@
 package com.grayraccoon.sample.authms.config.components;
 
-import com.grayraccoon.sample.authms.domain.dto.UsersDto;
+import com.grayraccoon.sample.authms.domain.Users;
 import com.grayraccoon.sample.authms.services.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
@@ -27,7 +27,7 @@ public class CustomTokenEnhancer implements TokenEnhancer {
         Map<String, Object> additionalInfo = new HashMap<>();
 
         String username = oAuth2Authentication.getName();
-        UsersDto user = userService.findUserByUsernameOrEmail(username);
+        Users user = userService.findUserByUsernameOrEmail(username);
 
         additionalInfo.put("userId", user.getUserId().toString());
         ((DefaultOAuth2AccessToken) oAuth2AccessToken).setAdditionalInformation(additionalInfo);

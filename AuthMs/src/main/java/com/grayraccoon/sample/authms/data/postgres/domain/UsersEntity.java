@@ -25,7 +25,7 @@ import java.util.UUID;
 @ToString
 @EqualsAndHashCode
 @Builder
-public class Users implements Serializable {
+public class UsersEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -83,6 +83,6 @@ public class Users implements Serializable {
     private LocalDateTime updateDateTime;
 
     @ManyToMany(mappedBy = "usersCollection")
-    private Set<Roles> rolesCollection;
+    private Set<RolesEntity> rolesCollection;
 
 }

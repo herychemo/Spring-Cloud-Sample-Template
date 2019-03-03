@@ -20,7 +20,7 @@ import java.util.Set;
 @ToString
 @EqualsAndHashCode
 @Builder
-public class Roles implements Serializable {
+public class RolesEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -42,9 +42,9 @@ public class Roles implements Serializable {
     @ManyToMany
     @com.fasterxml.jackson.annotation.JsonIgnore
     @EqualsAndHashCode.Exclude
-    private Set<Users> usersCollection;
+    private Set<UsersEntity> usersCollection;
 
-    public void addUser(Users user) {
+    public void addUser(UsersEntity user) {
         if (this.usersCollection == null) {
             this.usersCollection = new HashSet<>();
         }
