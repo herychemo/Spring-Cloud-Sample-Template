@@ -1,6 +1,5 @@
 package com.grayraccoon.sample.authms.data.postgres.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -10,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -25,6 +24,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
+@Builder
 public class Users implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -70,10 +70,11 @@ public class Users implements Serializable {
     @NotNull
     @Size(min = 1, max = 60)
     @Column(nullable = false, length = 60)
+    @ToString.Exclude
     private String password;
 
 
-    @Column
+    @Column(updatable = false)
     @CreationTimestamp
     private LocalDateTime createDateTime;
 
@@ -82,6 +83,6 @@ public class Users implements Serializable {
     private LocalDateTime updateDateTime;
 
     @ManyToMany(mappedBy = "usersCollection")
-    private Collection<Roles> rolesCollection;
+    private Set<Roles> rolesCollection;
 
 }

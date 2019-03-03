@@ -3,7 +3,7 @@ package com.grayraccoon.sample.authms.config;
 import com.grayraccoon.sample.authms.config.components.CustomAccessTokenConverter;
 import com.grayraccoon.sample.authms.config.components.CustomTokenEnhancer;
 import com.grayraccoon.sample.authms.services.CustomUserDetailsService;
-import com.grayraccoon.sample.authms.services.UserService;
+import com.grayraccoon.sample.authms.services.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -43,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private DataSource postgresDataSource;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Autowired
     private CustomUserDetailsService userDetailsService;

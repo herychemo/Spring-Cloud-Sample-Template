@@ -2,6 +2,7 @@ package com.grayraccoon.sample.authms.ws;
 
 import com.grayraccoon.sample.authms.domain.dto.UsersDto;
 import com.grayraccoon.sample.authms.services.UserService;
+import com.grayraccoon.sample.authms.services.UserServiceImpl;
 import com.grayraccoon.webutils.dto.GenericDto;
 import com.grayraccoon.webutils.errors.ApiError;
 import com.grayraccoon.webutils.exceptions.CustomApiException;
@@ -14,10 +15,7 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -49,7 +47,7 @@ public class UsersWebService {
 
     public GenericDto<List<UsersDto>> findAllUsersFallback(Throwable ex) {
         LOGGER.error("findAllUsersFallback", ex);
-        throw new CustomApiException(ApiError.builder().ex(ex).build());
+        throw new CustomApiException(ApiError.builder().throwable(ex).build());
     }
 
 
@@ -69,7 +67,7 @@ public class UsersWebService {
 
     public GenericDto<UsersDto> findMeFallback(OAuth2Authentication authentication, Throwable ex) {
         LOGGER.error("findMeFallback", ex);
-        throw new CustomApiException(ApiError.builder().ex(ex).build());
+        throw new CustomApiException(ApiError.builder().throwable(ex).build());
     }
 
 
@@ -88,8 +86,27 @@ public class UsersWebService {
 
     public GenericDto<UsersDto> findUserFallback(String userId, Throwable ex) {
         LOGGER.error("findUserFallback", ex);
-        throw new CustomApiException(ApiError.builder().ex(ex).build());
+        throw new CustomApiException(ApiError.builder().throwable(ex).build());
     }
+
+    @HystrixCommand(fallbackMethod = "saveUserFallback",
+            commandKey = "saveUser",
+            groupKey = "Users",
+            ignoreExceptions = CustomApiException.class)
+    @PostMapping("/users")
+    public GenericDto<UsersDto> saveUser(@RequestBody UsersDto usersDto) {
+        LOGGER.info("saveUser() {}", usersDto);
+        final UsersDto user = userService.createUser(usersDto);
+        LOGGER.info("Saved User: {}", user);
+        return GenericDto.<UsersDto>builder().data(user).build();
+    }
+
+    @HystrixCommand(ignoreExceptions = CustomApiException.class)
+    public GenericDto<UsersDto> saveUserFallback(UsersDto usersDto, Throwable ex) {
+        LOGGER.error("saveUserFallback", ex);
+        throw new CustomApiException(ApiError.builder().throwable(ex).build());
+    }
+
 
 
 

@@ -22,7 +22,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 
     @Transactional(readOnly = true)
-
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         Users user = usersRepository.findFirstByEmailOrUsername(s, s);

@@ -1,7 +1,7 @@
 package com.grayraccoon.sample.authms.config.components;
 
 import com.grayraccoon.sample.authms.domain.dto.UsersDto;
-import com.grayraccoon.sample.authms.services.UserService;
+import com.grayraccoon.sample.authms.services.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -15,10 +15,10 @@ import java.util.Map;
 @Component
 public class CustomTokenEnhancer implements TokenEnhancer {
 
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Autowired
-    public CustomTokenEnhancer( UserService userService) {
+    public CustomTokenEnhancer(UserServiceImpl userService) {
         this.userService = userService;
     }
 

@@ -7,7 +7,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(catalog = "cloud_db", schema = "auth")
@@ -18,6 +19,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
+@Builder
 public class Roles implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -39,6 +41,14 @@ public class Roles implements Serializable {
             @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)})
     @ManyToMany
     @com.fasterxml.jackson.annotation.JsonIgnore
-    private Collection<Users> usersCollection;
+    @EqualsAndHashCode.Exclude
+    private Set<Users> usersCollection;
+
+    public void addUser(Users user) {
+        if (this.usersCollection == null) {
+            this.usersCollection = new HashSet<>();
+        }
+        this.usersCollection.add(user);
+    }
 
 }

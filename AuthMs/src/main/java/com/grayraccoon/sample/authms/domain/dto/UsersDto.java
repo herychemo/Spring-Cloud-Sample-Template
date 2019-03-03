@@ -25,6 +25,7 @@ public class UsersDto implements Serializable {
     private String lastName;
 
     @com.fasterxml.jackson.annotation.JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @ToString.Exclude
     private String password;
 
     private LocalDateTime createDateTime;

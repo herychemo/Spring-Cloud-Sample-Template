@@ -40,7 +40,7 @@ public class AccountsWebService {
 
     public GenericDto<List<Accounts>> getAccountsFallback(Throwable ex) {
         LOGGER.error("getAccountsFallback", ex);
-        throw new CustomApiException(ApiError.builder().ex(ex).build());
+        throw new CustomApiException(ApiError.builder().throwable(ex).build());
     }
 
 
@@ -58,7 +58,7 @@ public class AccountsWebService {
 
     public GenericDto<Accounts> getAccountFallback(String id, Throwable ex) {
         LOGGER.error("getAccountFallback", ex);
-        throw new CustomApiException(ApiError.builder().ex(ex).build());
+        throw new CustomApiException(ApiError.builder().throwable(ex).build());
     }
 
 }
