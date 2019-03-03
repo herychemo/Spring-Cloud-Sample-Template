@@ -28,7 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("Username or Email Not Found");
         }
-        Users users = mapperConverterService.createUsersDtoFromUser(user);
+        Users users = mapperConverterService.createUserFromUsersEntity(user);
         return new CustomUserDetails(users);
     }
 

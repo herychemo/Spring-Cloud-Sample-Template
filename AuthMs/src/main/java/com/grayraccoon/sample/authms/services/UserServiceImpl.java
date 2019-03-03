@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<Users> findAllUsers() {
         List<UsersEntity> users = usersRepository.findAll();
-        return this.mapperConverterService.createUsersDtoListFromUsersList(users);
+        return this.mapperConverterService.createUsersListFromUsersEntitiesList(users);
     }
 
     @Transactional(readOnly = true)
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
         Optional<UsersEntity> usersOptional = usersRepository.findById(userId);
         if (usersOptional.isPresent()) {
             UsersEntity user = usersOptional.get();
-            return this.mapperConverterService.createUsersDtoFromUser(user);
+            return this.mapperConverterService.createUserFromUsersEntity(user);
         }
         throw new CustomApiException(
                 ApiError.builder()
@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
                             .build()
             );
         }
-        return this.mapperConverterService.createUsersDtoFromUser(u);
+        return this.mapperConverterService.createUserFromUsersEntity(u);
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
@@ -107,10 +107,10 @@ public class UserServiceImpl implements UserService {
         users.setActive(true);
 
         // New UsersEntity have ROLE_USER
-        Roles userRole = this.mapperConverterService.createRolesDtoFromRole(
+        Roles userRole = this.mapperConverterService.createRoleFromRolesEntity(
                 rolesRepository.findFirstByRole(ROLE_QUERY_USER)
         );
-        List<Roles> roles = new ArrayList<>();
+        Set<Roles> roles = new HashSet<>();
         roles.add(userRole);
         users.setRolesCollection(roles);
 
@@ -132,7 +132,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Users saveUser(Users users) {
 
-        UsersEntity user2save = mapperConverterService.createUserFromUsersDto(users);
+        UsersEntity user2save = mapperConverterService.createUsersEntityFromUser(users);
 
         if (user2save.getRolesCollection() == null) {
             throw new CustomApiException(
@@ -147,9 +147,10 @@ public class UserServiceImpl implements UserService {
         }
 
         user2save = usersRepository.saveAndFlush(user2save);
-        Users savedUser = mapperConverterService.createUsersDtoFromUser(user2save);
+        Users savedUser = mapperConverterService.createUserFromUsersEntity(user2save);
 
         return savedUser;
     }
+
 
 }

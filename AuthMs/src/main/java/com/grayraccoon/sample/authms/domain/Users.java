@@ -7,6 +7,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -30,7 +31,7 @@ public class Users implements Serializable {
 
     private LocalDateTime createDateTime;
     private LocalDateTime updateDateTime;
-    @Singular("role") private Collection<Roles> rolesCollection;
+    @Singular("role") private Set<Roles> rolesCollection;
 
     public Users(final Users user) {
         this.userId = user.userId;

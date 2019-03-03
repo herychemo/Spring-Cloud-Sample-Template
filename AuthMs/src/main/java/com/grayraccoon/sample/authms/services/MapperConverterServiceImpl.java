@@ -6,7 +6,6 @@ import com.grayraccoon.sample.authms.domain.Roles;
 import com.grayraccoon.sample.authms.domain.Users;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,7 +14,7 @@ import java.util.stream.Collectors;
 public class MapperConverterServiceImpl implements MapperConverterService {
 
     @Override
-    public Users createUsersDtoFromUser(UsersEntity user) {
+    public Users createUserFromUsersEntity(UsersEntity user) {
         return Users.builder()
                 .userId(user.getUserId())
                 .active(user.isActive())
@@ -27,17 +26,17 @@ public class MapperConverterServiceImpl implements MapperConverterService {
                 .createDateTime(user.getCreateDateTime())
                 .updateDateTime(user.getUpdateDateTime())
                 .rolesCollection(
-                        createRolesDtoCollectionFromRolesCollection(user.getRolesCollection())
+                        createRolesSetFromRolesEntitiesSet(user.getRolesCollection())
                 ).build();
     }
 
     @Override
-    public List<Users> createUsersDtoListFromUsersList(List<UsersEntity> usersEntityList) {
-        return usersEntityList.stream().map(this::createUsersDtoFromUser).collect(Collectors.toList());
+    public List<Users> createUsersListFromUsersEntitiesList(List<UsersEntity> usersEntityList) {
+        return usersEntityList.stream().map(this::createUserFromUsersEntity).collect(Collectors.toList());
     }
 
     @Override
-    public Roles createRolesDtoFromRole(RolesEntity role) {
+    public Roles createRoleFromRolesEntity(RolesEntity role) {
         return Roles.builder()
                 .roleId(role.getRoleId())
                 .role(role.getRole())
@@ -45,13 +44,13 @@ public class MapperConverterServiceImpl implements MapperConverterService {
     }
 
     @Override
-    public Collection<Roles> createRolesDtoCollectionFromRolesCollection(Collection<RolesEntity> roles) {
-        return roles.stream().map(this::createRolesDtoFromRole).collect(Collectors.toList());
+    public Set<Roles> createRolesSetFromRolesEntitiesSet(Set<RolesEntity> roles) {
+        return roles.stream().map(this::createRoleFromRolesEntity).collect(Collectors.toSet());
     }
 
 
     @Override
-    public UsersEntity createUserFromUsersDto(Users user) {
+    public UsersEntity createUsersEntityFromUser(Users user) {
         return UsersEntity.builder()
                 .userId(user.getUserId())
                 .active(user.isActive())
@@ -63,12 +62,12 @@ public class MapperConverterServiceImpl implements MapperConverterService {
                 .createDateTime(user.getCreateDateTime())
                 .updateDateTime(user.getUpdateDateTime())
                 .rolesCollection(
-                        createRolesCollectionFromRolesDtoCollection(user.getRolesCollection())
+                        createRolesEntitiesSetFromRolesSet(user.getRolesCollection())
                 ).build();
     }
 
     @Override
-    public RolesEntity createRoleFromRolesDto(Roles role) {
+    public RolesEntity createRolesEntityFromRole(Roles role) {
         return RolesEntity.builder()
                 .roleId(role.getRoleId())
                 .role(role.getRole())
@@ -76,8 +75,8 @@ public class MapperConverterServiceImpl implements MapperConverterService {
     }
 
     @Override
-    public Set<RolesEntity> createRolesCollectionFromRolesDtoCollection(Collection<Roles> roles) {
-        return roles.stream().map(this::createRoleFromRolesDto).collect(Collectors.toSet());
+    public Set<RolesEntity> createRolesEntitiesSetFromRolesSet(Set<Roles> roles) {
+        return roles.stream().map(this::createRolesEntityFromRole).collect(Collectors.toSet());
     }
 
 }
