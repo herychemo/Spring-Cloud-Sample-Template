@@ -14,8 +14,12 @@ public interface UserService {
     Users findUserByUsernameOrEmail(String query);
 
     Users createUser(Users users);
+
     Users updateUser(Users users, String sessionUserId);
     Users updateUser(Users users);
+
+    void deleteUser(String userId);
+    void deleteUser(UUID userId);
 
     void validateUsersEntity(UsersEntity usersEntity);
 

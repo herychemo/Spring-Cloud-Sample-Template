@@ -207,6 +207,45 @@ public class UserServiceImpl implements UserService {
         return savedUser;
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    @Override
+    public void deleteUser(String userId) {
+        try {
+            this.deleteUser(UUID.fromString(userId));
+        } catch (IllegalArgumentException ex) {
+            throw new CustomApiException(
+                    ApiError.builder()
+                            .throwable(ex)
+                            .status(HttpStatus.BAD_REQUEST)
+                            .subError(new ApiValidationError(userId))
+                            .build()
+            );
+        }
+    }
+
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    @Override
+    public void deleteUser(UUID userId) {
+        // if userId doesn't exist, next call will throw 404
+        Users user2delete = findUserById(userId);
+
+        UsersEntity usersEntity2delete = mapperConverterService.createUsersEntityFromUser(user2delete);
+        Set<RolesEntity> userRoles = usersEntity2delete.getRolesCollection();
+        Set<RolesEntity> rolesUserRemoved = new HashSet<>();
+        for (RolesEntity userRole: userRoles) {
+            RolesEntity role2persist = rolesRepository.findFirstByRole(userRole.getRole());
+            role2persist.getUsersCollection().remove(usersEntity2delete);
+            rolesUserRemoved.add(role2persist);
+        }
+        usersEntity2delete.setRolesCollection(rolesUserRemoved);
+        usersRepository.delete(usersEntity2delete);
+
+        //TODO: revoke all user access tokens
+
+        // TODO: Send Event User Was deleted
+    }
+
+
     @Override
     public void validateUsersEntity(UsersEntity usersEntity) {
         Set<ApiValidationError> errors = new HashSet<>();

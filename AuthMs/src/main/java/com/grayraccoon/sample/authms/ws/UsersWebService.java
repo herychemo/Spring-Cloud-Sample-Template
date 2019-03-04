@@ -149,6 +149,46 @@ public class UsersWebService {
     }
 
 
+    @HystrixCommand(fallbackMethod = "deleteUserFallback",
+            commandKey = "deleteUser",
+            groupKey = "UsersEntity",
+            ignoreExceptions = CustomApiException.class)
+    @DeleteMapping("/authenticated/users")
+    public GenericDto<String> deleteUser(OAuth2Authentication authentication) {
+        Map<String,Object> extraInfo = getExtraInfo(authentication);
+        String sessionUserId = (String) extraInfo.get("userId");
+
+        LOGGER.info("deleteUser() {}", sessionUserId);
+        userService.deleteUser(sessionUserId);
+        LOGGER.info("User Deleted.");
+        return GenericDto.<String>builder().data("User Deleted.").build();
+    }
+
+    @HystrixCommand(ignoreExceptions = CustomApiException.class)
+    public GenericDto<String> deleteUserFallback(OAuth2Authentication authentication, Throwable ex) {
+        LOGGER.error("deleteUserFallback", ex);
+        throw new CustomApiException(ApiError.builder().throwable(ex).build());
+    }
+
+
+    @HystrixCommand(fallbackMethod = "deleteUserAsAdminFallback",
+            commandKey = "deleteUserAsAdmin",
+            groupKey = "UsersEntity",
+            ignoreExceptions = CustomApiException.class)
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @DeleteMapping("/secured/users/{userId}")
+    public GenericDto<String> deleteUserAsAdmin(@PathVariable String userId) {
+        LOGGER.info("deleteUserAsAdmin() {}", userId);
+        userService.deleteUser(userId);
+        LOGGER.info("User Deleted.");
+        return GenericDto.<String>builder().data("User Deleted.").build();
+    }
+
+    @HystrixCommand(ignoreExceptions = CustomApiException.class)
+    public GenericDto<String> deleteUserAsAdminFallback(String userId, Throwable ex) {
+        LOGGER.error("deleteUserAsAdminFallback", ex);
+        throw new CustomApiException(ApiError.builder().throwable(ex).build());
+    }
 
 
     private Map<String, Object> getExtraInfo(OAuth2Authentication auth) {
