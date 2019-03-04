@@ -132,22 +132,74 @@ public class UserServiceImpl implements UserService {
 
         users = this.saveUser(users);
 
-        // Send Event New User Was Created
+        // TODO: Send Event New User Was Created
 
         return users;
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     @Override
-    public Users saveUser(Users users) {
+    public Users updateUser(Users users, String sessionUserId) {
+
+        if (!sessionUserId.equals( users.getUserId().toString() )) {
+            throw new CustomApiException(
+                    ApiError.builder()
+                            .status(HttpStatus.BAD_REQUEST)
+                            .subError(new ApiValidationError(
+                                    "userId",
+                                    users.getUserId().toString(),
+                                    "UserId doesn't match with UserId from authenticated user."))
+                            .build()
+            );
+        }
+
+        return this.updateUser(users);
+    }
+
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    @Override
+    public Users updateUser(Users users) {
+        Users originalUser = findUserById(users.getUserId());
+
+        //No updatable information
+        users.setCreateDateTime(originalUser.getCreateDateTime());
+        users.setUpdateDateTime(null);
+
+        // TODO: Different method will be created for updating password and roles
+        users.setPassword(originalUser.getPassword());
+        users.setRolesCollection(originalUser.getRolesCollection());
+
+
+        users = saveUser(users);
+
+        // TODO: Send Event User Was Updated
+
+        return users;
+    }
+
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    protected Users saveUser(Users users) {
 
         UsersEntity user2save = mapperConverterService.createUsersEntityFromUser(users);
 
         this.validateUsersEntity(user2save);
 
-        for (RolesEntity role: user2save.getRolesCollection()) {
-            role.addUser(user2save);
+        Set<RolesEntity> userRoles = user2save.getRolesCollection();
+
+        Set<RolesEntity> roles2persist = new HashSet<>();
+
+        final UUID userId = user2save.getUserId();
+        for (RolesEntity userRole: userRoles) {
+            RolesEntity role2persist = rolesRepository.findFirstByRole(userRole.getRole());
+
+            if (userId != null) {
+                role2persist.getUsersCollection().removeIf(
+                        userInRole -> userInRole.getUserId().equals(userId));
+            }
+            role2persist.addUser(user2save);
+            roles2persist.add(role2persist);
         }
+        user2save.setRolesCollection(roles2persist);
 
         user2save = usersRepository.saveAndFlush(user2save);
         Users savedUser = mapperConverterService.createUserFromUsersEntity(user2save);

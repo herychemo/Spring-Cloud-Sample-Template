@@ -88,21 +88,63 @@ public class UsersWebService {
         throw new CustomApiException(ApiError.builder().throwable(ex).build());
     }
 
-    @HystrixCommand(fallbackMethod = "saveUserFallback",
-            commandKey = "saveUser",
+    @HystrixCommand(fallbackMethod = "createUserFallback",
+            commandKey = "createUser",
             groupKey = "UsersEntity",
             ignoreExceptions = CustomApiException.class)
     @PostMapping("/users")
-    public GenericDto<Users> saveUser(@RequestBody Users users) {
-        LOGGER.info("saveUser() {}", users);
+    public GenericDto<Users> createUser(@RequestBody Users users) {
+        LOGGER.info("createUser() {}", users);
         final Users user = userService.createUser(users);
-        LOGGER.info("Saved User: {}", user);
+        LOGGER.info("Created User: {}", user);
         return GenericDto.<Users>builder().data(user).build();
     }
 
     @HystrixCommand(ignoreExceptions = CustomApiException.class)
-    public GenericDto<Users> saveUserFallback(Users users, Throwable ex) {
-        LOGGER.error("saveUserFallback", ex);
+    public GenericDto<Users> createUserFallback(Users users, Throwable ex) {
+        LOGGER.error("createUserFallback", ex);
+        throw new CustomApiException(ApiError.builder().throwable(ex).build());
+    }
+
+
+    @HystrixCommand(fallbackMethod = "updateUserFallback",
+            commandKey = "updateUser",
+            groupKey = "UsersEntity",
+            ignoreExceptions = CustomApiException.class)
+    @PutMapping("/authenticated/users")
+    public GenericDto<Users> updateUser(@RequestBody Users users, OAuth2Authentication authentication) {
+        Map<String,Object> extraInfo = getExtraInfo(authentication);
+        String sessionUserId = (String) extraInfo.get("userId");
+
+        LOGGER.info("updateUser() {}, {}", sessionUserId, users);
+        final Users user = userService.updateUser(users, sessionUserId);
+        LOGGER.info("Updated User: {}", user);
+        return GenericDto.<Users>builder().data(user).build();
+    }
+
+    @HystrixCommand(ignoreExceptions = CustomApiException.class)
+    public GenericDto<Users> updateUserFallback(Users users, OAuth2Authentication authentication, Throwable ex) {
+        LOGGER.error("updateUserFallback", ex);
+        throw new CustomApiException(ApiError.builder().throwable(ex).build());
+    }
+
+
+    @HystrixCommand(fallbackMethod = "updateUserAsAdminFallback",
+            commandKey = "updateUserAsAdmin",
+            groupKey = "UsersEntity",
+            ignoreExceptions = CustomApiException.class)
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PutMapping("/secured/users")
+    public GenericDto<Users> updateUserAsAdmin(@RequestBody Users users) {
+        LOGGER.info("updateUserAsAdmin() {}", users);
+        final Users user = userService.updateUser(users);
+        LOGGER.info("Updated User: {}", user);
+        return GenericDto.<Users>builder().data(user).build();
+    }
+
+    @HystrixCommand(ignoreExceptions = CustomApiException.class)
+    public GenericDto<Users> updateUserAsAdminFallback(Users users, Throwable ex) {
+        LOGGER.error("updateUserFallback", ex);
         throw new CustomApiException(ApiError.builder().throwable(ex).build());
     }
 
