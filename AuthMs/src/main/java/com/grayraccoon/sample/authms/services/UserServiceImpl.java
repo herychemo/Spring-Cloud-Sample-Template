@@ -183,9 +183,16 @@ public class UserServiceImpl implements UserService {
         UsersEntity user2save = mapperConverterService.createUsersEntityFromUser(users);
 
         this.validateUsersEntity(user2save);
+        fixRoles(user2save);
 
+        user2save = usersRepository.saveAndFlush(user2save);
+        Users savedUser = mapperConverterService.createUserFromUsersEntity(user2save);
+
+        return savedUser;
+    }
+
+    private void fixRoles(UsersEntity user2save) {
         Set<RolesEntity> userRoles = user2save.getRolesCollection();
-
         Set<RolesEntity> roles2persist = new HashSet<>();
 
         final UUID userId = user2save.getUserId();
@@ -200,11 +207,6 @@ public class UserServiceImpl implements UserService {
             roles2persist.add(role2persist);
         }
         user2save.setRolesCollection(roles2persist);
-
-        user2save = usersRepository.saveAndFlush(user2save);
-        Users savedUser = mapperConverterService.createUserFromUsersEntity(user2save);
-
-        return savedUser;
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
@@ -240,7 +242,7 @@ public class UserServiceImpl implements UserService {
         usersEntity2delete.setRolesCollection(rolesUserRemoved);
         usersRepository.delete(usersEntity2delete);
 
-        //TODO: revoke all user access tokens
+        // TODO: revoke all user access tokens
 
         // TODO: Send Event User Was deleted
     }
