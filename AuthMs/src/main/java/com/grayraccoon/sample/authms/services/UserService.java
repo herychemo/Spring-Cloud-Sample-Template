@@ -9,6 +9,7 @@ import java.util.UUID;
 public interface UserService {
 
     List<Users> findAllUsers();
+
     Users findUserById(String userId);
     Users findUserById(UUID userId);
     Users findUserByUsernameOrEmail(String query);
@@ -20,6 +21,9 @@ public interface UserService {
 
     void deleteUser(String userId);
     void deleteUser(UUID userId);
+
+    Users toggleAdminRoleTo(String userId);
+    Users toggleAdminRoleTo(UUID userId);
 
     void validateUsersEntity(UsersEntity usersEntity);
 

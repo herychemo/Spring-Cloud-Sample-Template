@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static com.grayraccoon.sample.authms.data.postgres.repository.RolesRepository.ROLE_QUERY_ADMIN;
 import static com.grayraccoon.sample.authms.data.postgres.repository.RolesRepository.ROLE_QUERY_USER;
 
 @Service
@@ -191,19 +193,61 @@ public class UserServiceImpl implements UserService {
         return savedUser;
     }
 
-    private void fixRoles(UsersEntity user2save) {
+    @Transactional(propagation = Propagation.REQUIRED)
+    protected void fixRoles(UsersEntity user2save) {
         Set<RolesEntity> userRoles = user2save.getRolesCollection();
         Set<RolesEntity> roles2persist = new HashSet<>();
+        Set<RolesEntity> roles2delete = new HashSet<>();
 
         final UUID userId = user2save.getUserId();
+
+        /* Handle missing roles */
+        final UsersEntity oldUser = usersRepository.findByUserId(userId);
+        final Set<RolesEntity> oldUserRoles = oldUser.getRolesCollection();
+        for (RolesEntity oldUserRole: oldUserRoles) {
+            boolean isOldRoleInNewUserRoles = userRoles.stream().anyMatch(userRole -> userRole.getRoleId().equals(oldUserRole.getRoleId()));
+            if (!isOldRoleInNewUserRoles) {
+                roles2delete.add(oldUserRole);
+            }
+        }
+
+        for (RolesEntity role2delete: roles2delete) {
+            oldUser.setRolesCollection(
+                    oldUser.getRolesCollection().stream()
+                            .filter(oldUserRole -> !oldUserRole.getRoleId().equals(role2delete.getRoleId()))
+                            .collect(Collectors.toSet())
+            );
+            role2delete.setUsersCollection(
+                    role2delete.getUsersCollection().stream()
+                            .filter(userInRole -> !userInRole.getUserId().equals(oldUser.getUserId()))
+                            .collect(Collectors.toSet())
+            );
+        }
+
+        if (!roles2delete.isEmpty()) {
+            //Updates deleted roles
+            rolesRepository.saveAll(roles2delete);
+        }
+
+
+        /* Handle new roles */
         for (RolesEntity userRole: userRoles) {
             RolesEntity role2persist = rolesRepository.findFirstByRole(userRole.getRole());
 
+            boolean mustAddUser = true;
+
             if (userId != null) {
-                role2persist.getUsersCollection().removeIf(
-                        userInRole -> userInRole.getUserId().equals(userId));
+                boolean isUserInRole = role2persist.getUsersCollection().stream()
+                        .anyMatch(userInRole -> userInRole.getUserId().equals(userId));
+                if (isUserInRole) {
+                    mustAddUser = false;
+                }
             }
-            role2persist.addUser(user2save);
+
+            if (mustAddUser) {
+                role2persist.addUser(user2save);
+            }
+
             roles2persist.add(role2persist);
         }
         user2save.setRolesCollection(roles2persist);
@@ -247,6 +291,62 @@ public class UserServiceImpl implements UserService {
         // TODO: Send Event User Was deleted
     }
 
+    @Transactional()
+    @Override
+    public Users toggleAdminRoleTo(String userId) {
+        try {
+            return this.toggleAdminRoleTo(UUID.fromString(userId));
+        } catch (IllegalArgumentException ex) {
+            throw new CustomApiException(
+                    ApiError.builder()
+                            .throwable(ex)
+                            .status(HttpStatus.BAD_REQUEST)
+                            .subError(new ApiValidationError(userId))
+                            .build()
+            );
+        }
+    }
+
+    @Transactional()
+    @Override
+    public Users toggleAdminRoleTo(UUID userId) {
+        return toggleUserRole(userId, ROLE_QUERY_ADMIN);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    protected Users toggleUserRole(UUID userId, String role) {
+        Users user = this.findUserById(userId);
+
+        boolean hasRole = doesUserHaveRole(user, role);
+        RolesEntity rolesEntity = rolesRepository.findFirstByRole(role);
+        if (hasRole) {
+            user.setRolesCollection(
+                    user.getRolesCollection().stream()
+                            .filter(roles -> !roles.getRole().equalsIgnoreCase(role))
+                    .collect(Collectors.toSet())
+            );
+        }else {
+            final Roles role2add = mapperConverterService.createRoleFromRolesEntity(rolesEntity);
+            user = user.toBuilder()
+                    .role(role2add)
+                    .build();
+        }
+
+        user = this.saveUser(user);
+
+        // TODO: Send Event user was updated
+        // TODO: Revoke all access tokens (due roles changed)
+
+        return user;
+    }
+
+    public boolean doesUserHaveRole(Users user, String role) {
+        if (user.getRolesCollection() == null) {
+            return false;
+        }
+        return user.getRolesCollection().stream()
+                .anyMatch(roles -> roles.getRole().equalsIgnoreCase(role));
+    }
 
     @Override
     public void validateUsersEntity(UsersEntity usersEntity) {

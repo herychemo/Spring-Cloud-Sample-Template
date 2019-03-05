@@ -33,7 +33,7 @@ public class UsersWebService {
 
     @HystrixCommand(fallbackMethod = "findAllUsersFallback",
             commandKey = "FindAllUsers",
-            groupKey = "UsersEntity",
+            groupKey = "Users",
             ignoreExceptions = CustomApiException.class)
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/secured/users")
@@ -52,7 +52,7 @@ public class UsersWebService {
 
     @HystrixCommand(fallbackMethod = "findMeFallback",
             commandKey = "findMe",
-            groupKey = "UsersEntity",
+            groupKey = "Users",
             ignoreExceptions = CustomApiException.class)
     @GetMapping("/authenticated/users/me")
     public GenericDto<Users> findMe(OAuth2Authentication authentication) {
@@ -72,7 +72,7 @@ public class UsersWebService {
 
     @HystrixCommand(fallbackMethod = "findUserFallback",
             commandKey = "findUser",
-            groupKey = "UsersEntity",
+            groupKey = "Users",
             ignoreExceptions = CustomApiException.class)
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/secured/users/{userId}")
@@ -90,7 +90,7 @@ public class UsersWebService {
 
     @HystrixCommand(fallbackMethod = "createUserFallback",
             commandKey = "createUser",
-            groupKey = "UsersEntity",
+            groupKey = "Users",
             ignoreExceptions = CustomApiException.class)
     @PostMapping("/users")
     public GenericDto<Users> createUser(@RequestBody Users users) {
@@ -109,7 +109,7 @@ public class UsersWebService {
 
     @HystrixCommand(fallbackMethod = "updateUserFallback",
             commandKey = "updateUser",
-            groupKey = "UsersEntity",
+            groupKey = "Users",
             ignoreExceptions = CustomApiException.class)
     @PutMapping("/authenticated/users")
     public GenericDto<Users> updateUser(@RequestBody Users users, OAuth2Authentication authentication) {
@@ -131,7 +131,7 @@ public class UsersWebService {
 
     @HystrixCommand(fallbackMethod = "updateUserAsAdminFallback",
             commandKey = "updateUserAsAdmin",
-            groupKey = "UsersEntity",
+            groupKey = "Users",
             ignoreExceptions = CustomApiException.class)
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PutMapping("/secured/users")
@@ -151,7 +151,7 @@ public class UsersWebService {
 
     @HystrixCommand(fallbackMethod = "deleteUserFallback",
             commandKey = "deleteUser",
-            groupKey = "UsersEntity",
+            groupKey = "Users",
             ignoreExceptions = CustomApiException.class)
     @DeleteMapping("/authenticated/users")
     public GenericDto<String> deleteUser(OAuth2Authentication authentication) {
@@ -173,7 +173,7 @@ public class UsersWebService {
 
     @HystrixCommand(fallbackMethod = "deleteUserAsAdminFallback",
             commandKey = "deleteUserAsAdmin",
-            groupKey = "UsersEntity",
+            groupKey = "Users",
             ignoreExceptions = CustomApiException.class)
     @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("/secured/users/{userId}")
@@ -187,6 +187,26 @@ public class UsersWebService {
     @HystrixCommand(ignoreExceptions = CustomApiException.class)
     public GenericDto<String> deleteUserAsAdminFallback(String userId, Throwable ex) {
         LOGGER.error("deleteUserAsAdminFallback", ex);
+        throw new CustomApiException(ApiError.builder().throwable(ex).build());
+    }
+
+
+    @HystrixCommand(fallbackMethod = "toggleAdminRoleToAsAdminFallback",
+            commandKey = "toggleAdminRoleToAsAdmin",
+            groupKey = "Roles",
+            ignoreExceptions = CustomApiException.class)
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PostMapping("/secured/users/roles/admin/{userId}")
+    public GenericDto<Users> toggleAdminRoleToAsAdmin(@PathVariable String userId) {
+        LOGGER.info("toggleAdminRoleToAsAdmin() {}", userId);
+        Users user = userService.toggleAdminRoleTo(userId);
+        LOGGER.info("User Role toggled. {}", user);
+        return GenericDto.<Users>builder().data(user).build();
+    }
+
+    @HystrixCommand(ignoreExceptions = CustomApiException.class)
+    public GenericDto<Users> toggleAdminRoleToAsAdminFallback(String userId, Throwable ex) {
+        LOGGER.error("toggleAdminRoleToAsAdminFallback", ex);
         throw new CustomApiException(ApiError.builder().throwable(ex).build());
     }
 
