@@ -25,6 +25,8 @@ public interface UserService {
     Users toggleAdminRoleTo(String userId);
     Users toggleAdminRoleTo(UUID userId);
 
+    void revokeAllAccessTokens(String userId);
+
     void validateUsersEntity(UsersEntity usersEntity);
 
     boolean isValidEmailCombination(String email, UUID userId);

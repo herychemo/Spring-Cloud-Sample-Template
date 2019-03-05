@@ -42,6 +42,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private CustomValidatorService customValidatorService;
 
+    @Autowired
+    private CustomTokenOperationsService customTokenOperationsService;
+
 
     @Transactional(readOnly = true)
     @Override
@@ -347,6 +350,18 @@ public class UserServiceImpl implements UserService {
         return user.getRolesCollection().stream()
                 .anyMatch(roles -> roles.getRole().equalsIgnoreCase(role));
     }
+
+
+    @Transactional(readOnly = false)
+    @Override
+    public void revokeAllAccessTokens(String userId) {
+        Users user = findUserById(userId);
+        customTokenOperationsService.revokeAllAccessTokensByUsernameList(
+                user.getUsername(),
+                user.getEmail()
+        );
+    }
+
 
     @Override
     public void validateUsersEntity(UsersEntity usersEntity) {

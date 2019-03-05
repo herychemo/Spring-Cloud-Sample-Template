@@ -211,6 +211,29 @@ public class UsersWebService {
     }
 
 
+    @HystrixCommand(fallbackMethod = "revokeAllMyTokensFallback",
+            commandKey = "revokeAllMyTokens",
+            groupKey = "Tokens",
+            ignoreExceptions = CustomApiException.class)
+    @PostMapping("/authenticated/users/revokeAll")
+    public GenericDto<String> revokeAllMyTokens(OAuth2Authentication authentication) {
+        Map<String,Object> extraInfo = getExtraInfo(authentication);
+        String sessionUserId = (String) extraInfo.get("userId");
+
+        LOGGER.info("revokeAllMyTokens() {}", sessionUserId);
+        userService.revokeAllAccessTokens(sessionUserId);
+        LOGGER.info("All tokens revoked");
+        return GenericDto.<String>builder().data("All tokens revoked").build();
+    }
+
+    @HystrixCommand(ignoreExceptions = CustomApiException.class)
+    public GenericDto<String> revokeAllMyTokensFallback(OAuth2Authentication authentication, Throwable ex) {
+        LOGGER.error("revokeAllMyTokensFallback", ex);
+        throw new CustomApiException(ApiError.builder().throwable(ex).build());
+    }
+
+
+
     private Map<String, Object> getExtraInfo(OAuth2Authentication auth) {
         OAuth2AuthenticationDetails details
                 = (OAuth2AuthenticationDetails) auth.getDetails();

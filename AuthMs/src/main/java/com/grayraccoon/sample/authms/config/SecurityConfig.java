@@ -19,6 +19,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.provider.approval.ApprovalStore;
+import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -51,10 +53,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private PasswordEncoder userPasswordEncoder;
 
-
-    @Autowired
-    private CustomAccessTokenConverter customAccessTokenConverter;
-
+    @Bean
+    protected CustomAccessTokenConverter customAccessTokenConverter() {
+        return new CustomAccessTokenConverter();
+    }
 
     @Bean
     @Override
@@ -92,8 +94,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public JwtAccessTokenConverter accessTokenConverter() {
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
         converter.setSigningKey(signingKey);
-        converter.setAccessTokenConverter(customAccessTokenConverter);
+        converter.setAccessTokenConverter(customAccessTokenConverter());
         return converter;
+    }
+
+
+    @Bean
+    public ApprovalStore approvalStore() {
+        ApprovalStore approvalStore = new JdbcApprovalStore(postgresDataSource);
+        return approvalStore;
     }
 
     @Bean
