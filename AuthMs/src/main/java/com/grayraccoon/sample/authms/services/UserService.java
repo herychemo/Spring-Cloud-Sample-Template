@@ -30,6 +30,7 @@ public interface UserService {
     Users toggleAdminRoleTo(UUID userId);
 
     void revokeAllAccessTokens(String userId);
+    void revokeAllAccessTokens(UUID userId);
 
     void validateUsersEntity(UsersEntity usersEntity);
 

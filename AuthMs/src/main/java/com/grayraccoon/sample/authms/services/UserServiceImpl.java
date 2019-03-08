@@ -171,7 +171,6 @@ public class UserServiceImpl implements UserService {
         users.setCreateDateTime(originalUser.getCreateDateTime());
         users.setUpdateDateTime(null);
 
-        // TODO: Different method will be created for updating password and roles
         users.setPassword(originalUser.getPassword());
         users.setRolesCollection(originalUser.getRolesCollection());
 
@@ -289,6 +288,9 @@ public class UserServiceImpl implements UserService {
         // if userId doesn't exist, next call will throw 404
         Users user2delete = findUserById(userId);
 
+        //  Revoke all user access tokens due to user deletion
+        revokeAllAccessTokens(userId);
+
         UsersEntity usersEntity2delete = mapperConverterService.createUsersEntityFromUser(user2delete);
         Set<RolesEntity> userRoles = usersEntity2delete.getRolesCollection();
         Set<RolesEntity> rolesUserRemoved = new HashSet<>();
@@ -299,8 +301,6 @@ public class UserServiceImpl implements UserService {
         }
         usersEntity2delete.setRolesCollection(rolesUserRemoved);
         usersRepository.delete(usersEntity2delete);
-
-        // TODO: revoke all user access tokens
 
         // TODO: Send Event User Was deleted
     }
@@ -340,8 +340,10 @@ public class UserServiceImpl implements UserService {
 
         user = this.saveUser(user);
 
+        //  Revoke all user access tokens due to password update
+        revokeAllAccessTokens(userId);
+        
         // TODO: Send Event user was updated
-        // TODO: Revoke all access tokens (due password changed)
 
         return user;
     }
@@ -389,8 +391,10 @@ public class UserServiceImpl implements UserService {
 
         user = this.saveUser(user);
 
+        //  Revoke all user access tokens due to updated roles
+        revokeAllAccessTokens(userId);
+
         // TODO: Send Event user was updated
-        // TODO: Revoke all access tokens (due roles changed)
 
         return user;
     }
@@ -407,6 +411,22 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     @Override
     public void revokeAllAccessTokens(String userId) {
+        try {
+            this.revokeAllAccessTokens(UUID.fromString(userId));
+        } catch (IllegalArgumentException ex) {
+            throw new CustomApiException(
+                    ApiError.builder()
+                            .throwable(ex)
+                            .status(HttpStatus.BAD_REQUEST)
+                            .subError(new ApiValidationError(userId))
+                            .build()
+            );
+        }
+    }
+
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    @Override
+    public void revokeAllAccessTokens(UUID userId) {
         Users user = findUserById(userId);
         customTokenOperationsService.revokeAllAccessTokensByUsernameList(
                 user.getUsername(),
