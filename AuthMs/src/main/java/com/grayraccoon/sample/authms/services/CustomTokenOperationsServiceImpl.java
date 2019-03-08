@@ -1,7 +1,6 @@
 package com.grayraccoon.sample.authms.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.approval.Approval;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
@@ -18,13 +17,13 @@ import java.util.Map;
 @Service
 public class CustomTokenOperationsServiceImpl implements CustomTokenOperationsService {
 
-    TokenStore tokenStore;
+    private TokenStore tokenStore;
 
     @Autowired
-    ApprovalStore approvalStore;
+    private ApprovalStore approvalStore;
 
     @Autowired
-    DefaultTokenServices tokenService;
+    private DefaultTokenServices tokenService;
 
     @Autowired
     public void setTokenStore(TokenStore tokenStore) {

@@ -1,6 +1,7 @@
 package com.grayraccoon.sample.authms.services;
 
 import com.grayraccoon.sample.authms.data.postgres.domain.UsersEntity;
+import com.grayraccoon.sample.authms.domain.PasswordUpdaterModel;
 import com.grayraccoon.sample.authms.domain.Users;
 
 import java.util.List;
@@ -21,6 +22,9 @@ public interface UserService {
 
     void deleteUser(String userId);
     void deleteUser(UUID userId);
+
+    Users updateUserPassword(String userId, PasswordUpdaterModel passwordUpdaterModel);
+    Users updateUserPasswordAsAdmin(String userId, PasswordUpdaterModel passwordUpdaterModel);
 
     Users toggleAdminRoleTo(String userId);
     Users toggleAdminRoleTo(UUID userId);

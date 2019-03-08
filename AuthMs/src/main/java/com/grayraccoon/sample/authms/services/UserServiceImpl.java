@@ -4,6 +4,7 @@ import com.grayraccoon.sample.authms.data.postgres.domain.RolesEntity;
 import com.grayraccoon.sample.authms.data.postgres.domain.UsersEntity;
 import com.grayraccoon.sample.authms.data.postgres.repository.RolesRepository;
 import com.grayraccoon.sample.authms.data.postgres.repository.UsersRepository;
+import com.grayraccoon.sample.authms.domain.PasswordUpdaterModel;
 import com.grayraccoon.sample.authms.domain.Roles;
 import com.grayraccoon.sample.authms.domain.Users;
 import com.grayraccoon.webutils.errors.ApiError;
@@ -304,6 +305,47 @@ public class UserServiceImpl implements UserService {
         // TODO: Send Event User Was deleted
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    @Override
+    public Users updateUserPassword(String userId, PasswordUpdaterModel passwordUpdaterModel) {
+        Users user = this.findUserById(userId);
+
+        boolean validOldPassword = userPasswordEncoder
+                .matches(passwordUpdaterModel.getOldPassword(), user.getPassword());
+
+        if (!validOldPassword) {
+            throw new CustomApiException(
+                    ApiError.builder()
+                            .status(HttpStatus.BAD_REQUEST)
+                            .subError(new ApiValidationError(
+                                    "oldPassword",
+                                    null,
+                                    "Old password doesn't match"))
+                            .build()
+            );
+        }
+
+        return updateUserPasswordAsAdmin(userId, passwordUpdaterModel);
+    }
+
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    @Override
+    public Users updateUserPasswordAsAdmin(String userId, PasswordUpdaterModel passwordUpdaterModel) {
+        Users user = this.findUserById(userId);
+
+        String newPassword = userPasswordEncoder
+                .encode(passwordUpdaterModel.getNewPassword());
+
+        user.setPassword(newPassword);
+
+        user = this.saveUser(user);
+
+        // TODO: Send Event user was updated
+        // TODO: Revoke all access tokens (due password changed)
+
+        return user;
+    }
+
     @Transactional()
     @Override
     public Users toggleAdminRoleTo(String userId) {
@@ -362,7 +404,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    @Transactional(readOnly = false)
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     @Override
     public void revokeAllAccessTokens(String userId) {
         Users user = findUserById(userId);

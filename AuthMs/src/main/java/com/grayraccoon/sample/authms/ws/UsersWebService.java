@@ -1,5 +1,6 @@
 package com.grayraccoon.sample.authms.ws;
 
+import com.grayraccoon.sample.authms.domain.PasswordUpdaterModel;
 import com.grayraccoon.sample.authms.domain.Users;
 import com.grayraccoon.sample.authms.services.UserService;
 import com.grayraccoon.webutils.dto.GenericDto;
@@ -187,6 +188,57 @@ public class UsersWebService {
     @HystrixCommand(ignoreExceptions = CustomApiException.class)
     public GenericDto<String> deleteUserAsAdminFallback(String userId, Throwable ex) {
         LOGGER.error("deleteUserAsAdminFallback", ex);
+        throw new CustomApiException(ApiError.builder().throwable(ex).build());
+    }
+
+
+    @HystrixCommand(fallbackMethod = "updateUserPasswordFallback",
+            commandKey = "updateUserPassword",
+            groupKey = "Users",
+            ignoreExceptions = CustomApiException.class)
+    @PutMapping("/authenticated/users/password")
+    public GenericDto<Users> updateUserPassword(
+            @RequestBody PasswordUpdaterModel passwordUpdaterModel,
+            OAuth2Authentication authentication) {
+        Map<String,Object> extraInfo = getExtraInfo(authentication);
+        String sessionUserId = (String) extraInfo.get("userId");
+
+        LOGGER.info("updateUserPassword() {}", sessionUserId);
+        Users user = userService.updateUserPassword(sessionUserId, passwordUpdaterModel);
+        LOGGER.info("User Password Updated. {}", user);
+        return GenericDto.<Users>builder().data(user).build();
+    }
+
+    @HystrixCommand(ignoreExceptions = CustomApiException.class)
+    public GenericDto<Users> updateUserPasswordFallback(
+            PasswordUpdaterModel passwordUpdaterModel,
+            OAuth2Authentication authentication,
+            Throwable ex) {
+        LOGGER.error("updateUserPasswordFallback", ex);
+        throw new CustomApiException(ApiError.builder().throwable(ex).build());
+    }
+
+
+    @HystrixCommand(fallbackMethod = "updateUserPasswordAsAdminFallback",
+            commandKey = "updateUserPasswordAsAdmin",
+            groupKey = "Users",
+            ignoreExceptions = CustomApiException.class)
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PutMapping("/secured/users/password/{userId}")
+    public GenericDto<Users> updateUserPasswordAsAdmin(
+            @RequestBody PasswordUpdaterModel passwordUpdaterModel,
+            @PathVariable String userId) {
+        LOGGER.info("updateUserPasswordAsAdmin() {}", userId);
+        Users user = userService.updateUserPasswordAsAdmin(userId, passwordUpdaterModel);
+        LOGGER.info("User Password Updated. {}", user);
+        return GenericDto.<Users>builder().data(user).build();
+    }
+
+    @HystrixCommand(ignoreExceptions = CustomApiException.class)
+    public GenericDto<Users> updateUserPasswordAsAdminFallback(
+            PasswordUpdaterModel passwordUpdaterModel,
+            String userId, Throwable ex) {
+        LOGGER.error("updateUserPasswordAsAdminFallback", ex);
         throw new CustomApiException(ApiError.builder().throwable(ex).build());
     }
 
