@@ -200,38 +200,10 @@ public class UserServiceImpl implements UserService {
     protected void fixRoles(UsersEntity user2save) {
         Set<RolesEntity> userRoles = user2save.getRolesCollection();
         Set<RolesEntity> roles2persist = new HashSet<>();
-        Set<RolesEntity> roles2delete = new HashSet<>();
 
         final UUID userId = user2save.getUserId();
 
-        /* Handle missing roles */
-        final UsersEntity oldUser = usersRepository.findByUserId(userId);
-        final Set<RolesEntity> oldUserRoles = oldUser.getRolesCollection();
-        for (RolesEntity oldUserRole: oldUserRoles) {
-            boolean isOldRoleInNewUserRoles = userRoles.stream().anyMatch(userRole -> userRole.getRoleId().equals(oldUserRole.getRoleId()));
-            if (!isOldRoleInNewUserRoles) {
-                roles2delete.add(oldUserRole);
-            }
-        }
-
-        for (RolesEntity role2delete: roles2delete) {
-            oldUser.setRolesCollection(
-                    oldUser.getRolesCollection().stream()
-                            .filter(oldUserRole -> !oldUserRole.getRoleId().equals(role2delete.getRoleId()))
-                            .collect(Collectors.toSet())
-            );
-            role2delete.setUsersCollection(
-                    role2delete.getUsersCollection().stream()
-                            .filter(userInRole -> !userInRole.getUserId().equals(oldUser.getUserId()))
-                            .collect(Collectors.toSet())
-            );
-        }
-
-        if (!roles2delete.isEmpty()) {
-            //Updates deleted roles
-            rolesRepository.saveAll(roles2delete);
-        }
-
+        handleMissingRoles(userId, userRoles);
 
         /* Handle new roles */
         for (RolesEntity userRole: userRoles) {
@@ -254,6 +226,44 @@ public class UserServiceImpl implements UserService {
             roles2persist.add(role2persist);
         }
         user2save.setRolesCollection(roles2persist);
+    }
+
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    protected void handleMissingRoles(UUID userId, Set<RolesEntity> userRoles) {
+        if (userId == null) {
+            return;
+        }
+        final UsersEntity oldUser = usersRepository.findByUserId(userId);
+        if (oldUser != null) {
+            /* If user already exists, handle missing roles */
+            Set<RolesEntity> roles2delete = new HashSet<>();
+            final Set<RolesEntity> oldUserRoles = oldUser.getRolesCollection();
+
+            for (RolesEntity oldUserRole: oldUserRoles) {
+                boolean isOldRoleInNewUserRoles = userRoles.stream().anyMatch(userRole -> userRole.getRoleId().equals(oldUserRole.getRoleId()));
+                if (!isOldRoleInNewUserRoles) {
+                    roles2delete.add(oldUserRole);
+                }
+            }
+
+            for (RolesEntity role2delete: roles2delete) {
+                oldUser.setRolesCollection(
+                        oldUser.getRolesCollection().stream()
+                                .filter(oldUserRole -> !oldUserRole.getRoleId().equals(role2delete.getRoleId()))
+                                .collect(Collectors.toSet())
+                );
+                role2delete.setUsersCollection(
+                        role2delete.getUsersCollection().stream()
+                                .filter(userInRole -> !userInRole.getUserId().equals(oldUser.getUserId()))
+                                .collect(Collectors.toSet())
+                );
+            }
+
+            if (!roles2delete.isEmpty()) {
+                //Updates deleted roles
+                rolesRepository.saveAll(roles2delete);
+            }
+        }
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
@@ -343,7 +353,7 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    public boolean doesUserHaveRole(Users user, String role) {
+    private boolean doesUserHaveRole(Users user, String role) {
         if (user.getRolesCollection() == null) {
             return false;
         }
