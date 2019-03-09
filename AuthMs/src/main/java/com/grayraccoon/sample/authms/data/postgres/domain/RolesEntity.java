@@ -42,6 +42,7 @@ public class RolesEntity implements Serializable {
     @ManyToMany
     @com.fasterxml.jackson.annotation.JsonIgnore
     @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<UsersEntity> usersCollection;
 
     public void addUser(UsersEntity user) {

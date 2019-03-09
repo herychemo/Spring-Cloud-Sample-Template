@@ -1,5 +1,7 @@
 package com.grayraccoon.sample.authms.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.approval.Approval;
@@ -16,6 +18,8 @@ import java.util.Map;
 
 @Service
 public class CustomTokenOperationsServiceImpl implements CustomTokenOperationsService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomTokenOperationsServiceImpl.class);
 
     private TokenStore tokenStore;
 
@@ -38,6 +42,8 @@ public class CustomTokenOperationsServiceImpl implements CustomTokenOperationsSe
             return;
         }
 
+        LOGGER.info("revokeAllAccessTokensByUsernameList(): {}", (Object[]) userNames);
+
         if (!(tokenStore instanceof JdbcTokenStore) ) {
             return;
         }
@@ -47,6 +53,8 @@ public class CustomTokenOperationsServiceImpl implements CustomTokenOperationsSe
 
         for (String username: userNames) {
             Collection<OAuth2AccessToken> accessTokens = ((JdbcTokenStore)tokenStore).findTokensByUserName(username);
+
+            LOGGER.info("Found {} access tokens for: {}", accessTokens.size(), username);
 
             for (OAuth2AccessToken oAuth2AccessToken: accessTokens) {
 
@@ -69,8 +77,11 @@ public class CustomTokenOperationsServiceImpl implements CustomTokenOperationsSe
         }
 
         if (allUserApprovals.isEmpty()) {
+            LOGGER.info("No approvals found.");
             return;
         }
+
+        LOGGER.info("Found {} approvals.", allUserApprovals.size());
 
         //Revoke all approvals
         approvalStore.revokeApprovals(allUserApprovals);

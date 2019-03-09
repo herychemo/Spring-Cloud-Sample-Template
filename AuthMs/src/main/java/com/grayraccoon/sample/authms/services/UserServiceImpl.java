@@ -12,6 +12,8 @@ import com.grayraccoon.webutils.errors.ApiValidationError;
 import com.grayraccoon.webutils.exceptions.CustomApiException;
 import com.grayraccoon.webutils.services.CustomValidatorService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +29,8 @@ import static com.grayraccoon.sample.authms.data.postgres.repository.RolesReposi
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     private MapperConverterService mapperConverterService;
@@ -50,6 +54,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public List<Users> findAllUsers() {
+        LOGGER.info("Finding all users...");
         List<UsersEntity> users = usersRepository.findAll();
         return this.mapperConverterService.createUsersListFromUsersEntitiesList(users);
     }
@@ -60,6 +65,7 @@ public class UserServiceImpl implements UserService {
         try {
             return this.findUserById(UUID.fromString(userId));
         } catch (IllegalArgumentException ex) {
+            LOGGER.error("Error in FindUserById: {}, {}", userId, ex);
             throw new CustomApiException(
                     ApiError.builder()
                             .throwable(ex)
@@ -73,6 +79,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public Users findUserById(UUID userId) {
+        LOGGER.info("findUserById: {}", userId);
         Optional<UsersEntity> usersOptional = usersRepository.findById(userId);
         if (usersOptional.isPresent()) {
             UsersEntity user = usersOptional.get();
@@ -89,6 +96,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public Users findUserByUsernameOrEmail(String query) {
+        LOGGER.info("findUserByUsernameOrEmail: {}", query);
         UsersEntity u = usersRepository.findFirstByEmailOrUsername(query, query);
         if (u == null) {
             throw new CustomApiException(
@@ -104,6 +112,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     @Override
     public Users createUser(Users users) {
+        LOGGER.info("createUser: {}, {}", users.getEmail(), users.getUsername());
         if (users.getUserId() != null) {
             throw new CustomApiException(
                     ApiError.builder()
@@ -138,6 +147,8 @@ public class UserServiceImpl implements UserService {
 
         users = this.saveUser(users);
 
+        LOGGER.info("New user has been created: {}", users.getUserId());
+
         // TODO: Send Event New User Was Created
 
         return users;
@@ -146,7 +157,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     @Override
     public Users updateUser(Users users, String sessionUserId) {
-
+        LOGGER.info("updateUser: {}, {}", sessionUserId, users);
         if (!sessionUserId.equals( users.getUserId().toString() )) {
             throw new CustomApiException(
                     ApiError.builder()
@@ -165,6 +176,8 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     @Override
     public Users updateUser(Users users) {
+        LOGGER.info("updateUser(): {}", users);
+
         Users originalUser = findUserById(users.getUserId());
 
         //No updatable information
@@ -177,6 +190,8 @@ public class UserServiceImpl implements UserService {
 
         users = saveUser(users);
 
+        LOGGER.info("User info has been updated for: {}", users.getUserId());
+
         // TODO: Send Event User Was Updated
 
         return users;
@@ -184,6 +199,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     protected Users saveUser(Users users) {
+        LOGGER.info("Saving User: {}, {}", users.getUserId(), users);
 
         UsersEntity user2save = mapperConverterService.createUsersEntityFromUser(users);
 
@@ -193,11 +209,15 @@ public class UserServiceImpl implements UserService {
         user2save = usersRepository.saveAndFlush(user2save);
         Users savedUser = mapperConverterService.createUserFromUsersEntity(user2save);
 
+        LOGGER.info("A User was saved successfully: {}", savedUser.getUserId());
+
         return savedUser;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     protected void fixRoles(UsersEntity user2save) {
+        LOGGER.info("Fixing Roles for userId: {}", user2save.getUserId());
+
         Set<RolesEntity> userRoles = user2save.getRolesCollection();
         Set<RolesEntity> roles2persist = new HashSet<>();
 
@@ -233,6 +253,7 @@ public class UserServiceImpl implements UserService {
         if (userId == null) {
             return;
         }
+        LOGGER.info("handling missing roles for: {}", userId);
         final UsersEntity oldUser = usersRepository.findByUserId(userId);
         if (oldUser != null) {
             /* If user already exists, handle missing roles */
@@ -245,6 +266,8 @@ public class UserServiceImpl implements UserService {
                     roles2delete.add(oldUserRole);
                 }
             }
+
+            LOGGER.info("For user: {} , deleting roles: {}", userId, roles2delete);
 
             for (RolesEntity role2delete: roles2delete) {
                 oldUser.setRolesCollection(
@@ -285,6 +308,8 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     @Override
     public void deleteUser(UUID userId) {
+        LOGGER.info("Trying to delete user: {}", userId);
+
         // if userId doesn't exist, next call will throw 404
         Users user2delete = findUserById(userId);
 
@@ -302,12 +327,16 @@ public class UserServiceImpl implements UserService {
         usersEntity2delete.setRolesCollection(rolesUserRemoved);
         usersRepository.delete(usersEntity2delete);
 
+        LOGGER.info("User deleted: {}", userId);
+
         // TODO: Send Event User Was deleted
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     @Override
     public Users updateUserPassword(String userId, PasswordUpdaterModel passwordUpdaterModel) {
+        LOGGER.info("Updating user password: {}", userId);
+
         Users user = this.findUserById(userId);
 
         boolean validOldPassword = userPasswordEncoder
@@ -325,12 +354,16 @@ public class UserServiceImpl implements UserService {
             );
         }
 
+        LOGGER.info("Old password validated, updating password for: {}", userId);
+
         return updateUserPasswordAsAdmin(userId, passwordUpdaterModel);
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     @Override
     public Users updateUserPasswordAsAdmin(String userId, PasswordUpdaterModel passwordUpdaterModel) {
+        LOGGER.info("updateUserPasswordAsAdmin(), {}", userId);
+
         Users user = this.findUserById(userId);
 
         String newPassword = userPasswordEncoder
@@ -342,7 +375,9 @@ public class UserServiceImpl implements UserService {
 
         //  Revoke all user access tokens due to password update
         revokeAllAccessTokens(userId);
-        
+
+        LOGGER.info("User password has been updated for: {}", userId);
+
         // TODO: Send Event user was updated
 
         return user;
@@ -372,6 +407,8 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     protected Users toggleUserRole(UUID userId, String role) {
+        LOGGER.info("Toggling {} role to user: {}", role, userId);
+
         Users user = this.findUserById(userId);
 
         boolean hasRole = doesUserHaveRole(user, role);
@@ -393,6 +430,8 @@ public class UserServiceImpl implements UserService {
 
         //  Revoke all user access tokens due to updated roles
         revokeAllAccessTokens(userId);
+
+        LOGGER.info("Role {}, has been toggled for: {}", role, userId);
 
         // TODO: Send Event user was updated
 
@@ -427,6 +466,8 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     @Override
     public void revokeAllAccessTokens(UUID userId) {
+        LOGGER.info("Revoking all access tokens to: {}", userId);
+
         Users user = findUserById(userId);
         customTokenOperationsService.revokeAllAccessTokensByUsernameList(
                 user.getUsername(),
@@ -437,6 +478,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void validateUsersEntity(UsersEntity usersEntity) {
+        LOGGER.info("validating a user entity for: {}", usersEntity.getUserId());
+
         Set<ApiValidationError> errors = new HashSet<>();
 
         if (usersEntity.getRolesCollection() == null) {
@@ -466,6 +509,8 @@ public class UserServiceImpl implements UserService {
                     "Username not unique."));
         }
 
+        LOGGER.info("Errors found while validating user entity: {}", errors.size());
+
         if (!errors.isEmpty()) {
             ApiError apiError = customValidatorService.getApiErrorFromApiValidationErrors(errors);
             throw new CustomApiException(apiError);
@@ -483,6 +528,5 @@ public class UserServiceImpl implements UserService {
     public boolean isValidUsernameCombination(String username, UUID userId) {
         return usersRepository.isValidUsernameCombination(username, userId);
     }
-
 
 }
