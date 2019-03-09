@@ -15,3 +15,5 @@ spring:
           skip-ssl-validation: true
           timeout: 6
 
+logging:
+  file: ${java.io.tmpdir}/logs/${spring.application.name}.log
