@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: SpringAdminServer
+  cloud:
+    config:
+      enabled: true
+      name: SpringAdminServer
+      uri: http://localhost:8888
