@@ -1,0 +1,15 @@
+#eg. https://github.com/elastic/kibana/blob/master/config/kibana.yml
+
+# The URLs of the Elasticsearch instances to use for all your queries.
+elasticsearch.hosts: ["http://elasticsearchserver:9200"]
+elasticsearch.url: "http://elasticsearchserver:9200"
+
+# The Kibana server's name.  This is used for display purposes.
+server.name: "Kibana-Server"
+server.host: "0.0.0.0"
+
+#xpack.monitoring.enabled: false
+#xpack.ml.enabled: false
+#xpack.security.enabled: false
+#xpack.graph.enabled: false
+#xpack.watcher.enabled: false
