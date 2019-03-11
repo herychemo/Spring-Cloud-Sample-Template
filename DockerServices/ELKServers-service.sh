@@ -16,36 +16,36 @@ case ${option} in
         docker run -p 9200:9200             \
             -p 9300:9300                    \
             --net ELK_network               \
+            --name elasticsearchserver      \
             -e "discovery.type=single-node" \
-            --name ElasticSearchServer      \
             -d elasticsearch:6.6.1
             #-v LOCAL_FOLDER:/usr/share/elasticsearch/data  \
 
         docker run -p 5601:5601             \
             --net ELK_network               \
-            --name KibanaServer             \
+            --name kibanaserver             \
             -v "$C_DIR\\conf\\kibana.yml:/usr/share/kibana/config/kibana.yml"  \
             -d kibana:6.6.1
 
          docker run -p 5000:5000            \
             --net ELK_network               \
-            --name LogstashServer           \
+            --name logstashserver           \
+            -v "$C_DIR\\conf\\logstash.yml:/usr/share/logstash/config/logstash.yml"  \
             -v "$C_DIR\\conf\\logstash_pipelines\\:/usr/share/logstash/pipeline/"      \
             -d -it logstash:6.6.1
-            #-v LOGSTASH_YML:/usr/share/logstash/config/logstash.yml  \
 
     ;;
     stop)
         echo "Performing: stop"
 
-        docker stop LogstashServer
-        docker rm LogstashServer
+        docker stop logstashserver
+        docker rm logstashserver
 
-        docker stop KibanaServer
-        docker rm KibanaServer
+        docker stop kibanaserver
+        docker rm kibanaserver
 
-        docker stop ElasticSearchServer
-        docker rm ElasticSearchServer
+        docker stop elasticsearchserver
+        docker rm elasticsearchserver
 
         docker network rm ELK_network
     ;;
@@ -55,15 +55,15 @@ case ${option} in
         case ${subOption} in
             E)
                 echo "Performing: log"
-                docker logs -f ElasticSearchServer
+                docker logs -f elasticsearchserver
             ;;
             L)
                 echo "Performing: log"
-                docker logs -f LogstashServer
+                docker logs -f logstashserver
             ;;
             K)
                 echo "Performing: log"
-                docker logs -f KibanaServer
+                docker logs -f kibanaserver
             ;;
             *)
                 echo "Not valid sub option for: ${0} ${1}, use [E], [L] or [K]"
