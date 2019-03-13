@@ -50,6 +50,15 @@ public class UsersWebService {
         throw new CustomApiException(ApiError.builder().throwable(ex).build());
     }
 
+    @GetMapping("/authenticated/user")
+    public Users findMeFlat(OAuth2Authentication authentication) {
+        Map<String,Object> extraInfo = getExtraInfo(authentication);
+        String userId = (String) extraInfo.get("userId");
+        LOGGER.info("findMeFlat() {}", userId);
+        final Users user = userService.findUserById(userId);
+        LOGGER.info("Flat User {} Found: {}", userId, user);
+        return user;
+    }
 
     @HystrixCommand(fallbackMethod = "findMeFallback",
             commandKey = "findMe",

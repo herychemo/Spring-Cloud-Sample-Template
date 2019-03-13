@@ -7,4 +7,8 @@ VALUES ('default_oauth2_client_id', 'usersjwtresourceid',
          /*Hashed with BCCrypt 4 Rounds: QWERTY74gray75raccoon634*/
         '$2a$04$qWE9dU8ZeFa3SoyZcobydeNvlgE70olQEOGvkgBEciwnNUR3Rc82q',
         'read,write', 'password,authorization_code,refresh_token,client_credentials',
-        null, null, 36000, 360000, null, true);
+        'http://localhost:8080/admin/login/oauth2/code/custom-client,http://localhost:8760/login/oauth2/code/custom-client',
+        'ROLE_ACTUATOR', 36000, 360000, null, true);
+/*
+You can add more redirect uri using comma
+*/

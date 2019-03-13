@@ -1,6 +1,6 @@
 spring:
   application:
-    name: SpringAdminServer
+    name: Spring-Admin-Server
   cloud:
     config:
       enabled: true

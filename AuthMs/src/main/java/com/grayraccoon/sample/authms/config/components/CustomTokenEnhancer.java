@@ -2,6 +2,7 @@ package com.grayraccoon.sample.authms.config.components;
 
 import com.grayraccoon.sample.authms.domain.Users;
 import com.grayraccoon.sample.authms.services.UserServiceImpl;
+import com.grayraccoon.webutils.exceptions.CustomApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -28,17 +29,20 @@ public class CustomTokenEnhancer implements TokenEnhancer {
         Map<String, Object> additionalInfo = new HashMap<>();
 
         String username = oAuth2Authentication.getName();
-        Users user = userService.findUserByUsernameOrEmail(username);
+        try {
+            final Users user = userService.findUserByUsernameOrEmail(username);
 
-        OAuth2Request oAuth2Request = oAuth2Authentication.getOAuth2Request();
+            OAuth2Request oAuth2Request = oAuth2Authentication.getOAuth2Request();
 
-        additionalInfo.put("userId", user.getUserId().toString());
-        additionalInfo.put("username", user.getUsername());
-        additionalInfo.put("email", user.getEmail());
-        additionalInfo.put("clientId", oAuth2Request.getClientId());
+            additionalInfo.put("userId", user.getUserId().toString());
+            additionalInfo.put("username", user.getUsername());
+            additionalInfo.put("email", user.getEmail());
+            additionalInfo.put("clientId", oAuth2Request.getClientId());
 
-        ((DefaultOAuth2AccessToken) oAuth2AccessToken).setAdditionalInformation(additionalInfo);
-
+            ((DefaultOAuth2AccessToken) oAuth2AccessToken).setAdditionalInformation(additionalInfo);
+        } catch (CustomApiException ex) {
+            // User doesn't exist
+        }
         return oAuth2AccessToken;
     }
 
