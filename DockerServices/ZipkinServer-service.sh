@@ -6,8 +6,11 @@ case ${option} in
         echo "Performing: start"
         docker pull openzipkin/zipkin
 
-        docker run -p 9411:9411 \
-            --name ZipkinServer \
+        docker network inspect SpringCloudNetwork &> /dev/null || docker network create SpringCloudNetwork
+
+        docker run -p 9411:9411     \
+            --net SpringCloudNetwork    \
+            --name ZipkinServer     \
             -d openzipkin/zipkin
 
     ;;
@@ -15,6 +18,8 @@ case ${option} in
         echo "Performing: stop"
         docker stop ZipkinServer
         docker rm ZipkinServer
+
+        docker network prune -f
     ;;
     log)
         echo "Performing: log"
