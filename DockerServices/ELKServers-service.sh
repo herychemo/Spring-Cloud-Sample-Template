@@ -11,24 +11,24 @@ case ${option} in
         docker pull kibana:6.6.1
         docker pull logstash:6.6.1
 
-        docker network create ELK_network
+        docker network inspect SpringCloudNetwork &> /dev/null || docker network create SpringCloudNetwork
 
         docker run -p 9200:9200             \
             -p 9300:9300                    \
-            --net ELK_network               \
+            --net SpringCloudNetwork        \
             --name elasticsearchserver      \
             -e "discovery.type=single-node" \
             -d elasticsearch:6.6.1
             #-v LOCAL_FOLDER:/usr/share/elasticsearch/data  \
 
         docker run -p 5601:5601             \
-            --net ELK_network               \
+            --net SpringCloudNetwork        \
             --name kibanaserver             \
             -v "$C_DIR\\conf\\kibana.yml:/usr/share/kibana/config/kibana.yml"  \
             -d kibana:6.6.1
 
          docker run -p 5000:5000            \
-            --net ELK_network               \
+            --net SpringCloudNetwork        \
             --name logstashserver           \
             -v "$C_DIR\\conf\\logstash.yml:/usr/share/logstash/config/logstash.yml"  \
             -v "$C_DIR\\conf\\logstash_pipelines\\:/usr/share/logstash/pipeline/"      \
@@ -47,7 +47,8 @@ case ${option} in
         docker stop elasticsearchserver
         docker rm elasticsearchserver
 
-        docker network rm ELK_network
+        #docker network rm SpringCloudNetwork
+        docker network prune -f
     ;;
     log)
 
