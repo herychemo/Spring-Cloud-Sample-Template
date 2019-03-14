@@ -8,3 +8,8 @@ spring:
       uri: http://localhost:8888
 logging:
   file: ${java.io.tmpdir}/logs/${spring.application.name}.log
+
+  logstash:
+    url: ${LOGSTASH_URL:localhost}
+    tcp-port: ${LOGSTASH_TCP_PORT:5000}
+    tcp-input: ${logging.logstash.url}:${logging.logstash.tcp-port}
