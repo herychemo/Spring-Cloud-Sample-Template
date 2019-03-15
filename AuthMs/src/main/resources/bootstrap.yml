@@ -7,9 +7,5 @@ spring:
       name: auth-ms
       uri: http://localhost:8888
 logging:
+  config: ${spring.cloud.config.uri}/${spring.cloud.config.name}/${spring.profiles.active:default}/master/logback-spring.xml
   file: ${java.io.tmpdir}/logs/${spring.application.name}.log
-
-  logstash:
-    url: ${LOGSTASH_URL:localhost}
-    tcp-port: ${LOGSTASH_TCP_PORT:5000}
-    tcp-input: ${logging.logstash.url}:${logging.logstash.tcp-port}
