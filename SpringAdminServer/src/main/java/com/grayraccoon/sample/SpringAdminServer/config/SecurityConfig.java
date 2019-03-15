@@ -94,7 +94,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 //.antMatchers("/actuator/**").permitAll()
                 .antMatchers("/assets/**").permitAll()
-                .antMatchers("/actuator", "/actuator/health", "/actuator/info").permitAll()
+                .antMatchers("/actuator", "/actuator/health", "/actuator/info", "/actuator/hystrix.stream").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/applications").permitAll()//
                 .antMatchers("/login**").permitAll()
                 .anyRequest().authenticated()

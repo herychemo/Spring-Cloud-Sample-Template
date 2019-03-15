@@ -35,7 +35,7 @@ public class UsersResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .requestMatchers()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/actuator", "/actuator/health", "/actuator/info").permitAll()
+                .antMatchers("/actuator", "/actuator/health", "/actuator/info", "/actuator/hystrix.stream").permitAll()
                 .antMatchers("/actuator/**").authenticated()
                 .antMatchers("/**/authenticated/**", "/**/secured/**").authenticated()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
