@@ -1,12 +1,19 @@
 package com.grayraccoon.sample.SpringAdminServer.config;
 
+import de.codecentric.boot.admin.server.web.client.HttpHeadersProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -29,16 +36,15 @@ import java.io.IOException;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    /*
     @Bean
-    public InstanceExchangeFilterFunction addExtraSessionInfoInterceptor(
+    public HttpHeadersProvider addExtraTokenHeaderProvider(
             OAuth2AuthorizedClientService clientService) {
-        return (instance, request, next) -> {
+        return  instance -> {
+            HttpHeaders httpHeaders = new HttpHeaders();
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
             if (auth == null) {
-                return next.exchange(request);
+                return httpHeaders;
             }
 
             OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) auth;
@@ -49,16 +55,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             );
 
             String accessToken = client.getAccessToken().getTokenValue();
-            System.out.println(String.format("Using AccessToken: %s", accessToken));
-            request.headers().add(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", accessToken));
+            //System.out.println(String.format("Using AccessToken: %s", accessToken));
+            httpHeaders.add(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", accessToken));
+
+            return httpHeaders;
+        };
+    }
+
+    /*This interceptor doesn't allow to update cookies.*/
+    /*
+    @Bean
+    public InstanceExchangeFilterFunction addExtraSessionInfoInterceptor() {
+        return (instance, request, next) -> {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null) {
+                return next.exchange(request);
+            }
 
             String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
-            System.out.println(String.format("Using SessionId: %s", sessionId));
-            request.cookies().add("JSESSIONID", sessionId);
+            //System.out.println(String.format("Using SessionId: %s", sessionId));
+            request.cookies().set("JSESSIONID", sessionId);
 
             return next.exchange(request);
         };
-    }*/
+    }
+    */
 
 
     @Override
