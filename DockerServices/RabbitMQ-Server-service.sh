@@ -12,7 +12,7 @@ case ${option} in
             -p 15672:15672	            \
             --net SpringCloudNetwork    \
             --name RabbitMQ-Server      \
-            --hostname OurRabbitMQ      \
+            --hostname RabbitMQ-Server      \
             -d rabbitmq:3.7-rc-management-alpine
 
     ;;
