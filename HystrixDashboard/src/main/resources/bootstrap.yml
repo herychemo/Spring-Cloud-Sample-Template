@@ -1,6 +1,6 @@
 spring:
   application:
-    name: HystrixDashboard
+    name: Hystrix-Dashboard
   cloud:
     config:
       enabled: true
