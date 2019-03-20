@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 public class SimpleLogFilter extends ZuulFilter {
 
@@ -19,7 +20,7 @@ public class SimpleLogFilter extends ZuulFilter {
 
     @Override
     public int filterOrder() {
-        return 1;
+        return 80;
     }
 
     @Override
@@ -31,8 +32,10 @@ public class SimpleLogFilter extends ZuulFilter {
     public Object run() throws ZuulException {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
+        Map<String, String> headers = ctx.getZuulRequestHeaders();
 
         LOGGER.info(String.format("%s request to %s", request.getMethod(), request.getRequestURL().toString()));
+        LOGGER.debug("Headers: {}", headers);
 
         return null;
     }

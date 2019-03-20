@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Zuul-Proxy
+    name: zuul-proxy
   cloud:
     config:
       enabled: true

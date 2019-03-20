@@ -7,7 +7,7 @@ VALUES ('default_oauth2_client_id', 'auth-ms-resource-id,accounts-ms-resource-id
          /*Hashed with BCCrypt 4 Rounds: QWERTY74gray75raccoon634*/
         '$2a$04$qWE9dU8ZeFa3SoyZcobydeNvlgE70olQEOGvkgBEciwnNUR3Rc82q',
         'read,write,user_info', 'password,authorization_code,refresh_token,client_credentials',
-        'http://localhost:8080/login,http://localhost:8080/admin/login/oauth2/code/custom-client,http://localhost:8760/login/oauth2/code/custom-client',
+        'http://localhost:8080/login,http://localhost:8760/login,http://localhost:9002/login',
         'ROLE_ACTUATOR', 36000, 360000, null, true);
 /*
 You can add more redirect uri using comma

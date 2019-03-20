@@ -1,23 +1,26 @@
 package com.grayraccoon.sample.SpringAdminServer.config;
 
 import de.codecentric.boot.admin.server.web.client.HttpHeadersProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -34,9 +37,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Configuration
-@EnableWebSecurity
+@EnableOAuth2Sso
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    /*
     @Bean
     public HttpHeadersProvider addExtraTokenHeaderProvider(
             OAuth2AuthorizedClientService clientService) {
@@ -62,25 +66,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             return httpHeaders;
         };
     }
+    */
 
-    /*This interceptor doesn't allow to update cookies.*/
-    /*
     @Bean
-    public InstanceExchangeFilterFunction addExtraSessionInfoInterceptor() {
-        return (instance, request, next) -> {
+    public HttpHeadersProvider addExtraTokenHeaderProvider(
+            @Qualifier("oauth2ClientContext") OAuth2ClientContext context,
+            OAuth2RestOperations restTemplate) {
+        return  instance -> {
+            HttpHeaders httpHeaders = new HttpHeaders();
+
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null) {
-                return next.exchange(request);
+                return httpHeaders;
             }
 
-            String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
-            //System.out.println(String.format("Using SessionId: %s", sessionId));
-            request.cookies().set("JSESSIONID", sessionId);
+            String accessToken = context.getAccessToken().getValue();
+            //System.out.println(String.format("Using AccessToken: %s", accessToken));
+            httpHeaders.set(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", accessToken));
 
-            return next.exchange(request);
+            return httpHeaders;
         };
     }
-    */
 
 
     @Override
@@ -101,8 +107,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/login**", "/oauth2**").permitAll()
                 .anyRequest().authenticated()
 
-                .and().oauth2Login()
-                .and().csrf().ignoringAntMatchers("/api/**", "/oauth2/**", "/actuator/**")
+                //.and().oauth2Login()
+                .and().csrf().ignoringAntMatchers(
+                        "/api/**", "/oauth2/**",
+                "/actuator/**", "/instances/**")
                 .csrfTokenRepository(csrfTokenRepository()).and()
                 .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
     }
@@ -141,6 +149,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return repository;
     }
 
+
+
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -152,6 +162,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         config.addAllowedMethod(HttpMethod.OPTIONS);
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
+    }
+
+    @Bean
+    public RequestContextListener requestContextListener() {
+        return new RequestContextListener();
+    }
+
+    @Bean
+    public OAuth2RestOperations restOperations(
+            OAuth2ProtectedResourceDetails resource,
+            @Qualifier("oauth2ClientContext") OAuth2ClientContext context
+    ) {
+        return new OAuth2RestTemplate(resource, context);
     }
 
 }

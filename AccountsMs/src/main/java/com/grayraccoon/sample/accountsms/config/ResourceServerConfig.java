@@ -34,16 +34,14 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         http
                 // this is to allow display in iframe
                 .headers().frameOptions().disable()
-                .and()
-                .cors().and()
-                .requestMatchers()
-                .and()
-                .authorizeRequests()
+                .and().requestMatchers()
+                .and().authorizeRequests()
                 .antMatchers("/actuator", "/actuator/health", "/actuator/info", "/actuator/hystrix.stream").permitAll()
                 .antMatchers("/actuator/**").authenticated()
                 .antMatchers("/**/authenticated/**", "/**/secured/**").authenticated()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .anyRequest().permitAll();
+                .anyRequest().permitAll()
+                .and().cors();
     }
 
     public static Map<String, Object> getExtraInfo(Authentication auth) {
