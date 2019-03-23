@@ -1,8 +1,8 @@
 package com.grayraccoon.sample.authms.services;
 
 import com.grayraccoon.sample.authms.data.postgres.domain.UsersEntity;
-import com.grayraccoon.sample.authms.domain.PasswordUpdaterModel;
-import com.grayraccoon.sample.authms.domain.Users;
+import com.grayraccoon.sample.authdomain.domain.PasswordUpdaterModel;
+import com.grayraccoon.sample.authdomain.domain.Users;
 
 import java.util.List;
 import java.util.UUID;

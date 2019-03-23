@@ -3,7 +3,7 @@ package com.grayraccoon.sample.authms.services;
 import com.grayraccoon.sample.authms.data.postgres.domain.CustomUserDetails;
 import com.grayraccoon.sample.authms.data.postgres.domain.UsersEntity;
 import com.grayraccoon.sample.authms.data.postgres.repository.UsersRepository;
-import com.grayraccoon.sample.authms.domain.Users;
+import com.grayraccoon.sample.authdomain.domain.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

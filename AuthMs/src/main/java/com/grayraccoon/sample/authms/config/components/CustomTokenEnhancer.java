@@ -1,6 +1,6 @@
 package com.grayraccoon.sample.authms.config.components;
 
-import com.grayraccoon.sample.authms.domain.Users;
+import com.grayraccoon.sample.authdomain.domain.Users;
 import com.grayraccoon.sample.authms.services.UserServiceImpl;
 import com.grayraccoon.webutils.exceptions.CustomApiException;
 import org.springframework.beans.factory.annotation.Autowired;

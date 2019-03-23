@@ -100,15 +100,29 @@
 
 
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.8.1</version>
+			<groupId>com.grayraccoon.sample</groupId>
+			<artifactId>accounts-domain</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.grayraccoon.sample</groupId>
+			<artifactId>auth-domain</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.grayraccoon</groupId>
 			<artifactId>web-utils</artifactId>
 			<version>0.1.0-SNAPSHOT</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.8.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>

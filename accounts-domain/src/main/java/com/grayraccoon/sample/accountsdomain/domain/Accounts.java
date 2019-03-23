@@ -1,4 +1,4 @@
-package com.grayraccoon.sample.authms.domain;
+package com.grayraccoon.sample.accountsdomain.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
@@ -9,9 +9,12 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
+@Getter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class Roles implements Serializable {
-    private Integer roleId;
-    private String role;
+public class Accounts implements Serializable {
+
+    private String id;
+    private String name;
+
 }

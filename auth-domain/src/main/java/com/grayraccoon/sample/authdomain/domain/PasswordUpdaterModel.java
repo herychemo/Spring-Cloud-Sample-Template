@@ -1,4 +1,4 @@
-package com.grayraccoon.sample.authms.domain;
+package com.grayraccoon.sample.authdomain.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;

@@ -1,7 +1,7 @@
 package com.grayraccoon.sample.authms.ws;
 
-import com.grayraccoon.sample.authms.domain.PasswordUpdaterModel;
-import com.grayraccoon.sample.authms.domain.Users;
+import com.grayraccoon.sample.authdomain.domain.PasswordUpdaterModel;
+import com.grayraccoon.sample.authdomain.domain.Users;
 import com.grayraccoon.sample.authms.services.UserService;
 import com.grayraccoon.webutils.dto.GenericDto;
 import com.grayraccoon.webutils.errors.ApiError;

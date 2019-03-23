@@ -1,8 +1,8 @@
 package com.grayraccoon.sample.authms.data.postgres.domain;
 
 
-import com.grayraccoon.sample.authms.domain.Roles;
-import com.grayraccoon.sample.authms.domain.Users;
+import com.grayraccoon.sample.authdomain.domain.Roles;
+import com.grayraccoon.sample.authdomain.domain.Users;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

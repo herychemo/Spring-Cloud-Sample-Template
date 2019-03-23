@@ -2,8 +2,8 @@ package com.grayraccoon.sample.authms.services;
 
 import com.grayraccoon.sample.authms.data.postgres.domain.RolesEntity;
 import com.grayraccoon.sample.authms.data.postgres.domain.UsersEntity;
-import com.grayraccoon.sample.authms.domain.Roles;
-import com.grayraccoon.sample.authms.domain.Users;
+import com.grayraccoon.sample.authdomain.domain.Roles;
+import com.grayraccoon.sample.authdomain.domain.Users;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
