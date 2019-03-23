@@ -24,7 +24,6 @@ import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 
@@ -70,8 +69,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public HttpHeadersProvider addExtraTokenHeaderProvider(
-            @Qualifier("oauth2ClientContext") OAuth2ClientContext context,
-            OAuth2RestOperations restTemplate) {
+            @Qualifier("oauth2ClientContext") OAuth2ClientContext context) {
         return  instance -> {
             HttpHeaders httpHeaders = new HttpHeaders();
 
@@ -82,6 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             String accessToken = context.getAccessToken().getValue();
             //System.out.println(String.format("Using AccessToken: %s", accessToken));
+
             httpHeaders.set(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", accessToken));
 
             return httpHeaders;
@@ -94,8 +93,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
     }
 
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
+
+
         http
                 .cors().and()
 
@@ -103,17 +105,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/assets/**").permitAll()
                 .antMatchers("/actuator", "/actuator/health", "/actuator/info", "/actuator/hystrix.stream").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/applications").permitAll()//
+                .antMatchers(HttpMethod.POST, "/api/applications").permitAll()
                 .antMatchers("/login**", "/oauth2**").permitAll()
                 .anyRequest().authenticated()
 
-                //.and().oauth2Login()
                 .and().csrf().ignoringAntMatchers(
                         "/api/**", "/oauth2/**",
                 "/actuator/**", "/instances/**")
                 .csrfTokenRepository(csrfTokenRepository()).and()
-                .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
+                .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
+        ;
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -150,19 +153,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
-
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
-        config.addAllowedMethod(HttpMethod.GET);
-        config.addAllowedMethod(HttpMethod.POST);
-        config.addAllowedMethod(HttpMethod.PUT);
-        config.addAllowedMethod(HttpMethod.DELETE);
-        config.addAllowedMethod(HttpMethod.OPTIONS);
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
 
     @Bean
     public RequestContextListener requestContextListener() {
