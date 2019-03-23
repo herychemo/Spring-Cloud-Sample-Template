@@ -19,7 +19,9 @@ public class SecurityConfig {
         return http.authorizeExchange()
 
                 .pathMatchers("/", "/login**", "/error**", "/oauth2/**").permitAll()
-                .pathMatchers("/actuator", "/actuator/health", "/actuator/info", "/actuator/hystrix.stream").permitAll()
+                .pathMatchers("/actuator", "/actuator/health",
+                        "/turbine.stream**",
+                        "/actuator/info", "/actuator/hystrix.stream").permitAll()
 
                 //.pathMatchers("/admin/**").permitAll()
 
