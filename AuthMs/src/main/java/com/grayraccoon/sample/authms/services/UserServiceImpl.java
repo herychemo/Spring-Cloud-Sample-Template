@@ -1,12 +1,12 @@
 package com.grayraccoon.sample.authms.services;
 
+import com.grayraccoon.sample.authdomain.domain.PasswordUpdaterModel;
+import com.grayraccoon.sample.authdomain.domain.Roles;
+import com.grayraccoon.sample.authdomain.domain.Users;
 import com.grayraccoon.sample.authms.data.postgres.domain.RolesEntity;
 import com.grayraccoon.sample.authms.data.postgres.domain.UsersEntity;
 import com.grayraccoon.sample.authms.data.postgres.repository.RolesRepository;
 import com.grayraccoon.sample.authms.data.postgres.repository.UsersRepository;
-import com.grayraccoon.sample.authdomain.domain.PasswordUpdaterModel;
-import com.grayraccoon.sample.authdomain.domain.Roles;
-import com.grayraccoon.sample.authdomain.domain.Users;
 import com.grayraccoon.webutils.errors.ApiError;
 import com.grayraccoon.webutils.errors.ApiValidationError;
 import com.grayraccoon.webutils.exceptions.CustomApiException;
@@ -50,6 +50,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private CustomTokenOperationsService customTokenOperationsService;
 
+    @Autowired
+    private UserEventsNotifierService userEventsNotifierService;
 
     @Transactional(readOnly = true)
     @Override
@@ -149,7 +151,7 @@ public class UserServiceImpl implements UserService {
 
         LOGGER.info("New user has been created: {}", users.getUserId());
 
-        // TODO: Send Event New User Was Created
+        userEventsNotifierService.sendUserCreatedEvent(users);
 
         return users;
     }
@@ -192,7 +194,7 @@ public class UserServiceImpl implements UserService {
 
         LOGGER.info("User info has been updated for: {}", users.getUserId());
 
-        // TODO: Send Event User Was Updated
+        userEventsNotifierService.sendUserUpdatedEvent(users);
 
         return users;
     }
@@ -329,7 +331,7 @@ public class UserServiceImpl implements UserService {
 
         LOGGER.info("User deleted: {}", userId);
 
-        // TODO: Send Event User Was deleted
+        userEventsNotifierService.sendUserDeletedEvent(userId.toString());
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
@@ -378,7 +380,7 @@ public class UserServiceImpl implements UserService {
 
         LOGGER.info("User password has been updated for: {}", userId);
 
-        // TODO: Send Event user was updated
+        userEventsNotifierService.sendUserUpdatedEvent(user);
 
         return user;
     }
@@ -433,7 +435,7 @@ public class UserServiceImpl implements UserService {
 
         LOGGER.info("Role {}, has been toggled for: {}", role, userId);
 
-        // TODO: Send Event user was updated
+        userEventsNotifierService.sendUserUpdatedEvent(user);
 
         return user;
     }

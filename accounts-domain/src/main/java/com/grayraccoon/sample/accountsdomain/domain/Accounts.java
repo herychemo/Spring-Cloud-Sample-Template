@@ -6,10 +6,10 @@ import lombok.*;
 import java.io.Serializable;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@Getter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Accounts implements Serializable {
