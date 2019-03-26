@@ -8,7 +8,7 @@ import com.grayraccoon.sample.authdomain.domain.Users;
 import java.util.List;
 import java.util.Set;
 
-public interface MapperConverterService {
+interface MapperConverterService {
 
     Users createUserFromUsersEntity(UsersEntity user);
     List<Users> createUsersListFromUsersEntitiesList(List<UsersEntity> usersEntityList);

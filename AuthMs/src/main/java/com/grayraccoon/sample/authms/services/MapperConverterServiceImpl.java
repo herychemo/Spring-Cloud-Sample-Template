@@ -11,10 +11,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class MapperConverterServiceImpl implements MapperConverterService {
+class MapperConverterServiceImpl implements MapperConverterService {
 
     @Override
     public Users createUserFromUsersEntity(UsersEntity user) {
+        if (user == null) {
+            return null;
+        }
         return Users.builder()
                 .userId(user.getUserId())
                 .active(user.isActive())
@@ -27,7 +30,8 @@ public class MapperConverterServiceImpl implements MapperConverterService {
                 .updateDateTime(user.getUpdateDateTime())
                 .rolesCollection(
                         createRolesSetFromRolesEntitiesSet(user.getRolesCollection())
-                ).build();
+                )
+                .build();
     }
 
     @Override
@@ -51,6 +55,9 @@ public class MapperConverterServiceImpl implements MapperConverterService {
 
     @Override
     public UsersEntity createUsersEntityFromUser(Users user) {
+        if (user == null) {
+            return null;
+        }
         return UsersEntity.builder()
                 .userId(user.getUserId())
                 .active(user.isActive())
@@ -63,7 +70,8 @@ public class MapperConverterServiceImpl implements MapperConverterService {
                 .updateDateTime(user.getUpdateDateTime())
                 .rolesCollection(
                         createRolesEntitiesSetFromRolesSet(user.getRolesCollection())
-                ).build();
+                )
+                .build();
     }
 
     @Override

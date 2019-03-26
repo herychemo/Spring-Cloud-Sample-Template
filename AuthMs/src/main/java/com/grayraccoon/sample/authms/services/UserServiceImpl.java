@@ -484,6 +484,8 @@ public class UserServiceImpl implements UserService {
 
         Set<ApiValidationError> errors = new HashSet<>();
 
+        // Custom Manual Validations
+
         if (usersEntity.getRolesCollection() == null) {
             errors.add(new ApiValidationError(
                     "roles",
@@ -491,9 +493,13 @@ public class UserServiceImpl implements UserService {
                     "User must have at least one role."));
         }
 
+        // Validations from annotations
         errors.addAll(
                 customValidatorService.validateObject(usersEntity)
         );
+
+
+        // Validations that require database
 
         if (StringUtils.isNotBlank(usersEntity.getEmail())
                 && !isValidEmailCombination(usersEntity.getEmail(), usersEntity.getUserId())) {
