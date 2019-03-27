@@ -65,33 +65,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return tokenService;
     }
 
-
-
-    @Bean
-    @Profile("default")
-    public JwtAccessTokenConverter accessTokenConverter() {
-        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        converter.setSigningKey(signingKey);
-        converter.setAccessTokenConverter(customAccessTokenConverter());
-        return converter;
-    }
-    @Bean
-    @Profile("default")
-    public TokenStore tokenStore() {
-        return new JwtTokenStore(accessTokenConverter());
-    }
-    @Bean
-    @Primary
-    @Profile("default")
-    public DefaultTokenServices defaultTokenServices() {
-        DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
-        defaultTokenServices.setTokenStore(tokenStore());
-        defaultTokenServices.setSupportRefreshToken(true);
-        return defaultTokenServices;
-    }
-
-
-
     @Bean
     public RequestContextListener requestContextListener() {
         return new RequestContextListener();
