@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "Roles", catalog = "cloud_db", schema = "auth")
+@Table(name = "Roles")
 @NamedQueries({
         @NamedQuery(name = "RolesEntity.findAll", query = "SELECT r FROM RolesEntity r")})
 @Data
@@ -36,7 +36,7 @@ public class RolesEntity implements Serializable {
     @Column(nullable = false, length = 90)
     private String role;
 
-    @JoinTable(name = "user_role", schema = "auth", joinColumns = {
+    @JoinTable(name = "user_role", joinColumns = {
             @JoinColumn(name = "role_id", referencedColumnName = "role_id", nullable = false)}, inverseJoinColumns = {
             @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)})
     @ManyToMany

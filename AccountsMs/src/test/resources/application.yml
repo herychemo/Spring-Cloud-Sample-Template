@@ -1,0 +1,27 @@
+
+spring:
+  datasource:
+    test:
+      jdbc-url: jdbc:h2:mem:cloud_db;MODE=PostgreSQL
+      username: sa
+      password: sa
+      driver-class-name: org.h2.Driver
+
+spring.flyway:
+  url: "jdbc:h2:mem:cloud_db;MODE=PostgreSQL"
+  user: sa
+  password: sa
+  baseline-on-migrate: true
+  schemas: accounts
+  locations: classpath:db/migration,classpath:db/test
+
+security:
+  signing-key: test123
+
+  jwt:
+    local-resource-id: test-resource-id
+
+  token-services:
+    client-id: test-client-id
+    client-secret: test-client-secret
+    check-token-url: dummy-url

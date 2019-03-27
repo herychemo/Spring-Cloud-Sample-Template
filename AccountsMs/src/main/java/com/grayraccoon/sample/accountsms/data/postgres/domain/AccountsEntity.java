@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "Accounts", catalog = "cloud_db", schema = "accounts")
+@Table(name = "Accounts")
 @NamedQueries({
         @NamedQuery(name = "AccountsEntity.findAll", query = "SELECT u FROM AccountsEntity u")})
 @Data

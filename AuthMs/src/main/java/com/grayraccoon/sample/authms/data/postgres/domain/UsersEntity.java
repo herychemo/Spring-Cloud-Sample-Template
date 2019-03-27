@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "Users", catalog = "cloud_db", schema = "auth", uniqueConstraints = {
+@Table(name = "Users", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"email"})
         , @UniqueConstraint(columnNames = {"username"})
 })
