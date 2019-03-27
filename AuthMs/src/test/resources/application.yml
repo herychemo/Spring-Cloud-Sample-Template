@@ -2,18 +2,21 @@
 spring:
   datasource:
     test:
-      jdbc-url: jdbc:h2:mem:cloud_db;MODE=PostgreSQL
+      jdbc-url: jdbc:h2:mem:cloud_db;MODE=PostgreSQL;INIT=CREATE SCHEMA IF NOT EXISTS public
       username: sa
       password: sa
       driver-class-name: org.h2.Driver
 
+  jpa:
+    database: default
+    hibernate.ddl-auto: validate
+    properties.hibernate.jdbc.lob.non_contextual_creation: true
 
 spring.flyway:
-  url: "jdbc:h2:mem:cloud_db;MODE=PostgreSQL"
-  user: sa
-  password: sa
+  url: ${spring.datasource.test.jdbc-url}
+  user: ${spring.datasource.test.username}
+  password: ${spring.datasource.test.password}
   baseline-on-migrate: true
-  schemas: auth
   locations: classpath:db/migration,classpath:db/test
 
 security:
@@ -21,4 +24,3 @@ security:
   security-realm: test realm
   jwt:
     local-resource-id: test-resource-id
-
