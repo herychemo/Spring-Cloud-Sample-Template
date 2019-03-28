@@ -27,10 +27,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = AuthMsApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AuthMsOauth2TokenTests {
+@SpringBootTest(classes = AuthMsApplication.class)
+public class AuthMsOauth2TokenIT {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuthMsOauth2TokenTests.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthMsOauth2TokenIT.class);
 
     @Autowired
     private WebApplicationContext wac;
@@ -56,7 +56,7 @@ public class AuthMsOauth2TokenTests {
 
     @Test
     public void getAccessTokenTestSuccess() throws Exception {
-        String access_token = getAdminAccessToken(mockMvc, "admin","password");
+        String access_token = getUserAccessToken(mockMvc, "admin","password");
 
         Assert.assertNotNull(access_token);
         Assert.assertNotEquals("", access_token);
@@ -64,7 +64,7 @@ public class AuthMsOauth2TokenTests {
 
     @Test
     public void checkTokenTestSuccess() throws Exception {
-        String access_token = getAdminAccessToken(mockMvc, "admin","password");
+        String access_token = getUserAccessToken(mockMvc, "admin","password");
 
         ResultActions result =
                 mockMvc.perform(get("/oauth/check_token")
@@ -90,7 +90,7 @@ public class AuthMsOauth2TokenTests {
         LOGGER.info("checkTokenTestSuccess(): {}", resultString);
     }
 
-    public static String getAdminAccessToken(MockMvc mockMvc, String username, String password) throws Exception {
+    public static String getUserAccessToken(MockMvc mockMvc, String username, String password) throws Exception {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "password");
         params.add("client_id", "test-client-id");
@@ -111,7 +111,7 @@ public class AuthMsOauth2TokenTests {
         JacksonJsonParser jsonParser = new JacksonJsonParser();
 
         String access_token = jsonParser.parseMap(resultString).get("access_token").toString();
-        LOGGER.info("getAdminAccessToken(): {}", access_token);
+        LOGGER.info("getUserAccessToken(): {}", access_token);
 
         return access_token;
     }

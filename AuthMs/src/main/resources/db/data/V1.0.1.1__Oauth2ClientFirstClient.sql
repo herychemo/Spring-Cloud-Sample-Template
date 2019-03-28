@@ -12,6 +12,7 @@ VALUES (
           || ',hystrix-dashboard-resource-id'
         ,
 
+         -- https://www.browserling.com/tools/bcrypt
          /*Hashed with BCCrypt 4 Rounds: QWERTY74gray75raccoon634*/
         '$2a$04$qWE9dU8ZeFa3SoyZcobydeNvlgE70olQEOGvkgBEciwnNUR3Rc82q',
         'read,write,user_info', 'password,authorization_code,refresh_token,client_credentials',

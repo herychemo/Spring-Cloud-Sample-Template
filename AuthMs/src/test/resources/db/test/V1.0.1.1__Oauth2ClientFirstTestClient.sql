@@ -7,6 +7,7 @@ VALUES (
         'test-client-id',
         'test-resource-id',
 
+         -- https://www.browserling.com/tools/bcrypt
          /*Hashed with BCCrypt 4 Rounds: test-client-secret*/
         '$2a$04$uc0oRwRXu0uO.JRHUbbxf.qhw5Knx1vhjZ9MdngSFPM.V7DK/jooG',
         'read,write,user_info', 'password,authorization_code,refresh_token,client_credentials',

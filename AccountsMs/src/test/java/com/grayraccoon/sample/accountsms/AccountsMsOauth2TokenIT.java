@@ -25,10 +25,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = AccountsMsApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AccountsMsOauth2TokenTests {
+@SpringBootTest(classes = AccountsMsApplication.class)
+public class AccountsMsOauth2TokenIT {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AccountsMsOauth2TokenTests.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountsMsOauth2TokenIT.class);
 
     @Autowired
     private WebApplicationContext wac;
@@ -47,7 +47,7 @@ public class AccountsMsOauth2TokenTests {
 
     @Test
     public void getAccessTokenTestSuccess() throws Exception {
-        String access_token = getAdminAccessToken(mockMvc, "admin","password");
+        String access_token = getUserAccessToken(mockMvc, "admin","password");
 
         Assert.assertNotNull(access_token);
         Assert.assertNotEquals("", access_token);
@@ -55,7 +55,7 @@ public class AccountsMsOauth2TokenTests {
 
     @Test
     public void checkTokenTestSuccess() throws Exception {
-        String access_token = getAdminAccessToken(mockMvc, "admin","password");
+        String access_token = getUserAccessToken(mockMvc, "admin","password");
 
         ResultActions result =
                 mockMvc.perform(get("/oauth/check_token")
@@ -81,7 +81,7 @@ public class AccountsMsOauth2TokenTests {
         LOGGER.info("checkTokenTestSuccess(): {}", resultString);
     }
 
-    public static String getAdminAccessToken(MockMvc mockMvc, String username, String password) throws Exception {
+    public static String getUserAccessToken(MockMvc mockMvc, String username, String password) throws Exception {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "password");
         params.add("client_id", "test-client-id");
@@ -102,7 +102,7 @@ public class AccountsMsOauth2TokenTests {
         JacksonJsonParser jsonParser = new JacksonJsonParser();
 
         String access_token = jsonParser.parseMap(resultString).get("access_token").toString();
-        LOGGER.info("getAdminAccessToken(): {}", access_token);
+        LOGGER.info("getUserAccessToken(): {}", access_token);
 
         return access_token;
     }
