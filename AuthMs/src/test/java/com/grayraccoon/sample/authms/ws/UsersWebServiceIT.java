@@ -10,13 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.grayraccoon.sample.authms.AuthMsOauth2TokenIT.getUserAccessToken;
+import static com.grayraccoon.sample.authms.config.AuthUtils.getUserAccessToken;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -56,9 +57,9 @@ public class UsersWebServiceIT {
 
         mockMvc.perform(get("/ws/secured/users")
                 .header("Authorization", "Bearer " + access_token)
-                .accept("application/json;charset=UTF-8"))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.data", Matchers.notNullValue()))
                 .andExpect(jsonPath("$.error").doesNotExist())
                 .andExpect(jsonPath("$.data", hasSize(2)))
@@ -70,9 +71,9 @@ public class UsersWebServiceIT {
     @Test
     public void findAllUsers_Unauthorized_Test() throws Exception {
         mockMvc.perform(get("/ws/secured/users")
-                .accept("application/json;charset=UTF-8"))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isUnauthorized())   //  401
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.error", Matchers.notNullValue()))
                 .andExpect(jsonPath("$.data").doesNotExist())
         ;
@@ -84,9 +85,9 @@ public class UsersWebServiceIT {
 
         mockMvc.perform(get("/ws/secured/users")
                 .header("Authorization", "Bearer " + access_token)
-                .accept("application/json;charset=UTF-8"))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isForbidden())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.error", Matchers.notNullValue()))
                 .andExpect(jsonPath("$.data").doesNotExist())
         ;

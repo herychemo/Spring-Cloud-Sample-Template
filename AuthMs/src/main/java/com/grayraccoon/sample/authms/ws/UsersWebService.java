@@ -298,6 +298,9 @@ public class UsersWebService {
     private Map<String, Object> getExtraInfo(OAuth2Authentication auth) {
         OAuth2AuthenticationDetails details
                 = (OAuth2AuthenticationDetails) auth.getDetails();
+        if (details.getDecodedDetails() != null) {
+            return (Map<String, Object>) details.getDecodedDetails();
+        }
         OAuth2AccessToken accessToken = tokenStore
                 .readAccessToken(details.getTokenValue());
         return accessToken.getAdditionalInformation();
