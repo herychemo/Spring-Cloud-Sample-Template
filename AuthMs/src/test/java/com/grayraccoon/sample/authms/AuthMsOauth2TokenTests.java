@@ -1,10 +1,13 @@
 package com.grayraccoon.sample.authms;
 
 import org.flywaydb.core.Flyway;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,16 +23,17 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AuthMsApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AuthMsOauth2TokenTests {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthMsOauth2TokenTests.class);
+
     @Autowired
     private WebApplicationContext wac;
-
 
     @Autowired
     private FilterChainProxy springSecurityFilterChain;
@@ -51,7 +55,7 @@ public class AuthMsOauth2TokenTests {
     }
 
     @Test
-    public void getAccessTokenTest() throws Exception {
+    public void getAccessTokenTestSuccess() throws Exception {
         String access_token = getAdminAccessToken(mockMvc, "admin","password");
 
         Assert.assertNotNull(access_token);
@@ -59,29 +63,31 @@ public class AuthMsOauth2TokenTests {
     }
 
     @Test
-    public void checkTokenTest() throws Exception {
+    public void checkTokenTestSuccess() throws Exception {
         String access_token = getAdminAccessToken(mockMvc, "admin","password");
 
         ResultActions result =
                 mockMvc.perform(get("/oauth/check_token")
                         .param("token", access_token)
-                .with(httpBasic("test-client-id","test-client-secret"))
+                        .with(httpBasic("test-client-id","test-client-secret"))
                         .accept("application/json;charset=UTF-8"))
                         .andExpect(status().isOk())
-                        .andExpect(content().contentType("application/json;charset=UTF-8"));
+                        .andExpect(content().contentType("application/json;charset=UTF-8"))
+
+                        .andExpect(jsonPath("$.userId", Matchers.notNullValue()))
+                        .andExpect(jsonPath("$.userId", Matchers.is("01e3d8d5-1119-4111-b3d0-be6562ca5914")))
+
+                        .andExpect(jsonPath("$.username", Matchers.notNullValue()))
+                        .andExpect(jsonPath("$.username", Matchers.is("admin")))
+                        .andExpect(jsonPath("$.scope[*]",
+                                Matchers.containsInAnyOrder("read","write","user_info")))
+                        .andExpect(jsonPath("$.authorities[*]",
+                                Matchers.containsInAnyOrder("ROLE_ADMIN","ROLE_USER")))
+                        .andExpect(jsonPath("$.active", Matchers.is(true)))
+                ;
 
         String resultString = result.andReturn().getResponse().getContentAsString();
-
-        JacksonJsonParser jsonParser = new JacksonJsonParser();
-        String userId = jsonParser.parseMap(resultString).get("userId").toString();
-        String username = jsonParser.parseMap(resultString).get("username").toString();
-
-        Assert.assertNotNull(userId);
-        Assert.assertEquals("01e3d8d5-1119-4111-b3d0-be6562ca5914", userId);
-
-        Assert.assertNotNull(username);
-        Assert.assertEquals("admin", username);
-
+        LOGGER.info("checkTokenTestSuccess(): {}", resultString);
     }
 
     public static String getAdminAccessToken(MockMvc mockMvc, String username, String password) throws Exception {
@@ -97,12 +103,17 @@ public class AuthMsOauth2TokenTests {
                 .with(httpBasic("test-client-id","test-client-secret"))
                 .accept("application/json;charset=UTF-8"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"));
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.access_token", Matchers.notNullValue()));
 
         String resultString = result.andReturn().getResponse().getContentAsString();
 
         JacksonJsonParser jsonParser = new JacksonJsonParser();
-        return jsonParser.parseMap(resultString).get("access_token").toString();
+
+        String access_token = jsonParser.parseMap(resultString).get("access_token").toString();
+        LOGGER.info("getAdminAccessToken(): {}", access_token);
+
+        return access_token;
     }
 
 }

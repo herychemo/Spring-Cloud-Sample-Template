@@ -48,7 +48,7 @@ public class TestAuthorizationServerConfig extends AuthorizationServerConfigurer
                 .withClient("test-client-id")
                 .secret(passwordEncoder.encode("test-client-secret"))
                 .resourceIds("test-resource-id")
-                .scopes("read", "write")
+                .scopes("read", "write", "user_info")
                 .authorizedGrantTypes("password","authorization_code","client_credentials")
                 .autoApprove(true)
                 .and().build();
