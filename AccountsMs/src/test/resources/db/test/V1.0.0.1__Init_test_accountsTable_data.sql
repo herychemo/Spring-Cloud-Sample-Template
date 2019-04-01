@@ -8,4 +8,8 @@ INSERT INTO accounts
 VALUES ( '01e3d8d5-1119-4111-b3d0-be6562ca5914',
          'Some User Admin Admin', 'theAdmin', DEFAULT, 'M',
          DEFAULT, DEFAULT, DEFAULT, DEFAULT,
+         DEFAULT, DEFAULT, DEFAULT, DEFAULT),
+       ( '01e3d8d5-1119-4111-b3d0-be6562ca5901',
+         'Some User User User', 'theUser', DEFAULT, 'M',
+         DEFAULT, DEFAULT, DEFAULT, DEFAULT,
          DEFAULT, DEFAULT, DEFAULT, DEFAULT);

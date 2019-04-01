@@ -5,7 +5,9 @@ import com.grayraccoon.sample.authms.AuthMsApplication;
 import com.grayraccoon.sample.authms.services.UserService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -44,6 +46,11 @@ public class UsersWebServiceTests {
     @Mock
     private UserService userService;
 
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+
     @Before
     public void setup() throws ServletException {
         SecurityContextHolderAwareRequestFilter authInjector = new SecurityContextHolderAwareRequestFilter();
@@ -53,6 +60,7 @@ public class UsersWebServiceTests {
                 .addFilter(authInjector)
                 .build();
     }
+
 
     @Test
     public void findAllUsers_Success_Test() throws Exception {
@@ -100,6 +108,25 @@ public class UsersWebServiceTests {
     }
 
     @Test
+    public void findAllUsers_Failed_Test() throws Exception {
+        final String exceptionMessage = "Some Internal Error.";
+
+        expectedException.expectCause(isA(RuntimeException.class));
+        expectedException.expectMessage(exceptionMessage);
+
+        Mockito.when(userService.findAllUsers()).thenThrow(
+                new RuntimeException(exceptionMessage)
+        );
+
+        mockMvc.perform(get("/ws/secured/users")
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+        ;
+    }
+
+
+    @Test
     public void findMe_Success_Test() throws Exception {
 
         final String user_userId = "01a0a0a0-1110-1000-a0a0-aa0000aa0000";
@@ -124,6 +151,25 @@ public class UsersWebServiceTests {
                 .andExpect(jsonPath("$.data.userId", is(user_userId)))
                 .andExpect(jsonPath("$.data.username", is(user_username)))
                 .andExpect(jsonPath("$.data.name", is(user_name)))
+        ;
+    }
+
+    @Test
+    public void findMe_Failed_Test() throws Exception {
+        final String exceptionMessage = "Some Internal Error.";
+
+        expectedException.expectCause(isA(RuntimeException.class));
+        expectedException.expectMessage(exceptionMessage);
+
+        Mockito.when(userService.findUserById(anyString())).thenThrow(
+                new RuntimeException(exceptionMessage)
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(getOauthTestAuthentication());
+        mockMvc.perform(get("/ws/authenticated/users/me")
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
         ;
     }
 

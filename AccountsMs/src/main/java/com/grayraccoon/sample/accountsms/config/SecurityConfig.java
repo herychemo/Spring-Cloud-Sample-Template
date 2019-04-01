@@ -11,11 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
-import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.web.context.request.RequestContextListener;
 
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -31,9 +27,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${security.token-services.check-token-url}")
     private String tokenServicesCheckTokenUrl;
-
-    @Value("${security.signing-key:dummy-value}")
-    private String signingKey;
 
 
     @Bean

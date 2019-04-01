@@ -65,6 +65,8 @@ public class UsersWebServiceIT {
                 .andExpect(jsonPath("$.data", hasSize(2)))
                 .andExpect(jsonPath("$.data[0].userId", is("01e3d8d5-1119-4111-b3d0-be6562ca5914")))
                 .andExpect(jsonPath("$.data[0].username", is("admin")))
+                .andExpect(jsonPath("$.data[1].userId", is("01e3d8d5-1119-4111-b3d0-be6562ca5901")))
+                .andExpect(jsonPath("$.data[1].username", is("user")))
         ;
     }
 
