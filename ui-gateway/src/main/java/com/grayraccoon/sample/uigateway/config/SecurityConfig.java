@@ -1,6 +1,7 @@
 package com.grayraccoon.sample.uigateway.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
@@ -10,6 +11,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @EnableWebFluxSecurity
+@Profile("!default")
 public class SecurityConfig {
 
     //https://www.baeldung.com/spring-oauth-login-webflux

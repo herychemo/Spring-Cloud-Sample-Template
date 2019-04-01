@@ -1,0 +1,17 @@
+
+spring.security.oauth2.client:
+  registration:
+    test-client:
+      provider: test-provider
+      client-id: test-client-id
+      client-secret: test-client-secret
+      client-authentication-method: basic
+      authorization-grant-type: authorization_code
+      scope: read
+      redirect-uri-template: "{baseUrl}/login/oauth2/code/{registrationId}"
+      client-name: Test Client
+  provider:
+    test-provider:
+      authorization-uri: /oauth/authorize
+      token-uri: /oauth/token
+      user-info-uri: /user/me
