@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,7 +26,9 @@ import javax.servlet.ServletException;
 import java.util.Arrays;
 import java.util.UUID;
 
+import static com.grayraccoon.sample.accountsms.config.AuthUtils.getOauthTestAuthentication;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -120,5 +123,32 @@ public class AccountsWebServiceTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
         ;
     }
+
+
+    @Test
+    public void findMe_Success_Test() throws Exception {
+
+        final String account_accountId = "01a0a0a0-1110-1000-a0a0-aa0000aa0000";
+        final String account_fullName = "Some User Admin Admin";
+
+        Mockito.when(accountService.findAccountById(anyString())).thenReturn(
+                Accounts.builder()
+                        .accountId(UUID.fromString(account_accountId))
+                        .fullName(account_fullName)
+                        .build()
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(getOauthTestAuthentication());
+        mockMvc.perform(get("/ws/authenticated/accounts/me")
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.data", Matchers.notNullValue()))
+                .andExpect(jsonPath("$.error").doesNotExist())
+                .andExpect(jsonPath("$.data.accountId", is(account_accountId)))
+                .andExpect(jsonPath("$.data.fullName", is(account_fullName)))
+        ;
+    }
+
 
 }

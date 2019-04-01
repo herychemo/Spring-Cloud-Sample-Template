@@ -5,10 +5,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.OAuth2Request;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import java.io.Serializable;
+import java.util.*;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -44,6 +56,53 @@ public final class AuthUtils {
         return access_token;
     }
 
+
+    public static Authentication getOauthTestAuthentication() {
+        OAuth2Authentication oAuth2Authentication = new OAuth2Authentication(getOauth2Request(), getAuthentication());
+        OAuth2AuthenticationDetails authDetails = new OAuth2AuthenticationDetails(new MockHttpServletRequest());
+        authDetails.setDecodedDetails(oAuth2Authentication.getUserAuthentication().getDetails());
+        oAuth2Authentication.setDetails( authDetails );
+        return oAuth2Authentication;
+    }
+
+    public static OAuth2Request getOauth2Request () {
+        String clientId = "test-client-id";
+        Map<String, String> requestParameters = Collections.emptyMap();
+        boolean approved = true;
+        String redirectUrl = "http://my-redirect-url.com";
+        Set<String> responseTypes = Collections.emptySet();
+        Set<String> scopes = Collections.emptySet();
+        Set<String> resourceIds = Collections.emptySet();
+        Map<String, Serializable> extensionProperties = Collections.emptyMap();
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("whatever");
+
+        OAuth2Request oAuth2Request = new OAuth2Request(requestParameters, clientId, authorities,
+                approved, scopes, resourceIds, redirectUrl, responseTypes, extensionProperties);
+
+        return oAuth2Request;
+    }
+
+    public static Authentication getAuthentication() {
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("USER", "ADMIN");
+
+        User userPrincipal = new User("admin",
+                "",true,true,
+                true,true, authorities);
+
+        TestingAuthenticationToken token = new TestingAuthenticationToken(userPrincipal, null, authorities);
+        token.setAuthenticated(true);
+        token.setDetails(tokenDetails());
+
+        return token;
+    }
+
+    public static Map<String, String> tokenDetails() {
+        HashMap<String, String> details = new HashMap<>();
+        details.put("userId", "01e3d8d5-1119-4111-b3d0-be6562ca5914");
+        details.put("username", "admin");
+        details.put("name", "Some User");
+        return details;
+    }
 
 
 }
