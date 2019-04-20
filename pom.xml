@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.grayraccoon.sample</groupId>
+    <artifactId>Spring-Cloud-Sample-Template</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Spring-Cloud-Sample-Template</name>
+    <description>This is a Simple Spring Cloud Microservices Stack Sample Template.</description>
+
+    <modules>
+        <module>ConfigServer</module>
+        <module>EurekaServer</module>
+        <module>HystrixDashboard</module>
+        <module>SpringAdminServer</module>
+        <module>auth-domain</module>
+        <module>AuthMs</module>
+        <module>accounts-domain</module>
+        <module>AccountsMs</module>
+        <module>ZuulApiProxy</module>
+        <module>ui-gateway</module>
+        <module>turbine-server</module>
+    </modules>
+
+</project>
