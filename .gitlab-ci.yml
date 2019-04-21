@@ -3,6 +3,12 @@ image: maven:latest
 variables:
   MAVEN_CLI_OPTS: "--batch-mode"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  GIT_SUBMODULE_STRATEGY: recursive
+
+# for older versions of Gitlab runner
+#before_script:
+#  - git submodule sync --recursive
+#  - git submodule update --init --recursive
 
 cache:
   paths:
