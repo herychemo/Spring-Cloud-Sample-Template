@@ -130,14 +130,20 @@ public class UsersWebServiceTests {
     public void findMe_Success_Test() throws Exception {
 
         final String user_userId = "01a0a0a0-1110-1000-a0a0-aa0000aa0000";
+        final boolean user_active = true;
+        final String user_email = "admin@admin.com";
         final String user_username = "admin";
         final String user_name = "Some User";
+        final String user_lastName = "Admin Admin";
 
         Mockito.when(userService.findUserById(anyString())).thenReturn(
                 Users.builder()
                         .userId(UUID.fromString(user_userId))
+                        .active(user_active)
+                        .email(user_email)
                         .username(user_username)
                         .name(user_name)
+                        .lastName(user_lastName)
                         .build()
         );
 
@@ -149,8 +155,11 @@ public class UsersWebServiceTests {
                 .andExpect(jsonPath("$.data", Matchers.notNullValue()))
                 .andExpect(jsonPath("$.error").doesNotExist())
                 .andExpect(jsonPath("$.data.userId", is(user_userId)))
+                .andExpect(jsonPath("$.data.active", is(user_active)))
+                .andExpect(jsonPath("$.data.email", is(user_email)))
                 .andExpect(jsonPath("$.data.username", is(user_username)))
                 .andExpect(jsonPath("$.data.name", is(user_name)))
+                .andExpect(jsonPath("$.data.lastName", is(user_lastName)))
         ;
     }
 
@@ -167,6 +176,60 @@ public class UsersWebServiceTests {
 
         SecurityContextHolder.getContext().setAuthentication(getOauthTestAuthentication());
         mockMvc.perform(get("/ws/authenticated/users/me")
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+        ;
+    }
+
+
+    @Test
+    public void findUser_Success_Test() throws Exception {
+
+        final String user_userId = "01a0a0a0-1110-1000-a0a0-aa0000aa0000";
+        final boolean user_active = true;
+        final String user_email = "admin@admin.com";
+        final String user_username = "admin";
+        final String user_name = "Some User";
+        final String user_lastName = "Admin Admin";
+
+        Mockito.when(userService.findUserById(anyString())).thenReturn(
+                Users.builder()
+                        .userId(UUID.fromString(user_userId))
+                        .username(user_username)
+                        .name(user_name)
+                        .build()
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(getOauthTestAuthentication());
+        mockMvc.perform(get(String.format("/ws/secured/users/%s", user_userId))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.data", Matchers.notNullValue()))
+                .andExpect(jsonPath("$.error").doesNotExist())
+                .andExpect(jsonPath("$.data.userId", is(user_userId)))
+                .andExpect(jsonPath("$.data.active", is(user_active)))
+                .andExpect(jsonPath("$.data.email", is(user_email)))
+                .andExpect(jsonPath("$.data.username", is(user_username)))
+                .andExpect(jsonPath("$.data.name", is(user_name)))
+                .andExpect(jsonPath("$.data.lastName", is(user_lastName)))
+        ;
+    }
+
+    @Test
+    public void findUser_Failed_Test() throws Exception {
+        final String exceptionMessage = "Some Internal Error.";
+
+        expectedException.expectCause(isA(RuntimeException.class));
+        expectedException.expectMessage(exceptionMessage);
+
+        Mockito.when(userService.findUserById(anyString())).thenThrow(
+                new RuntimeException(exceptionMessage)
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(getOauthTestAuthentication());
+        mockMvc.perform(get("/ws/secured/users/12345")
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
