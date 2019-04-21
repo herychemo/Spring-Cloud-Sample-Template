@@ -196,8 +196,11 @@ public class UsersWebServiceTests {
         Mockito.when(userService.findUserById(anyString())).thenReturn(
                 Users.builder()
                         .userId(UUID.fromString(user_userId))
+                        .active(user_active)
+                        .email(user_email)
                         .username(user_username)
                         .name(user_name)
+                        .lastName(user_lastName)
                         .build()
         );
 
