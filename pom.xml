@@ -12,6 +12,7 @@
     <description>This is a Simple Spring Cloud Microservices Stack Sample Template.</description>
 
     <modules>
+        <module>Web-Utils</module>
         <module>ConfigServer</module>
         <module>EurekaServer</module>
         <module>auth-domain</module>

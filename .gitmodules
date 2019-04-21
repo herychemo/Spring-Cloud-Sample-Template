@@ -1,0 +1,3 @@
+[submodule "Web-Utils"]
+	path = Web-Utils
+	url = git@gitlab.com:herychemo/Web-Utils.git
