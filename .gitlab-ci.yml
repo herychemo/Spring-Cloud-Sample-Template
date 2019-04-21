@@ -11,12 +11,12 @@ variables:
 #  - git submodule update --init --recursive
 
 before_script:
-  - ls -aR
+  - ls -al
 
 cache:
   paths:
     - .m2/repository/
-    - target/
+    - "*/target"
 
 build:
   stage: build
