@@ -1,6 +1,8 @@
 [submodule "Web-Utils"]
 	path = Web-Utils
-	url = ../Web-Utils.git
+	url = git@gitlab.com:herychemo/Web-Utils.git
+	branch = master
 [submodule "SampleConfigRepo"]
 	path = SampleConfigRepo
-	url = ../SampleConfigRepo.git
+	url = git@gitlab.com:herychemo/SampleConfigRepo.git
+	branch = master
