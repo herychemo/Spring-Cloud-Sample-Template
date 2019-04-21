@@ -14,15 +14,15 @@
     <modules>
         <module>ConfigServer</module>
         <module>EurekaServer</module>
-        <module>HystrixDashboard</module>
-        <module>SpringAdminServer</module>
         <module>auth-domain</module>
         <module>AuthMs</module>
+        <module>ZuulApiProxy</module>
+        <module>turbine-server</module>
         <module>accounts-domain</module>
         <module>AccountsMs</module>
-        <module>ZuulApiProxy</module>
+        <module>HystrixDashboard</module>
+        <module>SpringAdminServer</module>
         <module>ui-gateway</module>
-        <module>turbine-server</module>
     </modules>
 
 </project>
