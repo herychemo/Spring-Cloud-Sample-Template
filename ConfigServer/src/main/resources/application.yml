@@ -9,11 +9,11 @@ spring:
     config:
       server:
         git:
-          uri: ${GIT_REPO_URL:https://github.com/herychemo/SampleConfigRepo.git}
+          uri: ${GIT_REPO_URL:https://gitlab.com/herychemo/SampleConfigRepo.git}
           #username: ${config_server_username}
           #password: ${config_server_password}
           skip-ssl-validation: true
-          timeout: 6
+          timeout: 8
 
 logging:
   file: ${java.io.tmpdir}/logs/${spring.application.name}.log

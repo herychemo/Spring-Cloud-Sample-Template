@@ -1,3 +1,6 @@
 [submodule "Web-Utils"]
 	path = Web-Utils
 	url = ../../herychemo/Web-Utils.git
+[submodule "SampleConfigRepo"]
+	path = SampleConfigRepo
+	url = ../../herychemo/SampleConfigRepo.git
