@@ -6,9 +6,11 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 # for older versions of Gitlab runner
+#before_script:
+#  - git submodule sync --recursive
+#  - git submodule update --init --recursive
+
 before_script:
-  - git submodule sync --recursive
-  - git submodule update --init --recursive
   - ls -aR
 
 cache:
