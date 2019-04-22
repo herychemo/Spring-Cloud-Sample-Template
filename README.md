@@ -54,7 +54,7 @@ The recommended order to start all is:
 
 The configuration for all the projects is in a Configuration repository in:
 
-https://github.com/herychemo/SampleConfigRepo 
+https://gitlab.com/herychemo/SampleConfigRepo
 
 Notice that the configured configuration is for Dev profile, so that you will need to run all projects using:
 
