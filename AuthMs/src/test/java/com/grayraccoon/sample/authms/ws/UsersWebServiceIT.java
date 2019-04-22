@@ -163,6 +163,29 @@ public class UsersWebServiceIT {
     }
 
     @Test
+    public void findUser_NotFound_Test() throws Exception {
+        final String access_token = getUserAccessToken(mockMvc, "admin","password");
+
+        final String user_userId = "01e3d8d5-0009-4111-b3d0-be6562ca5922";
+
+        mockMvc.perform(get(String.format("/ws/secured/users/%s", user_userId))
+                .header("Authorization", "Bearer " + access_token)
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isNotFound())   //  404
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.error", Matchers.notNullValue()))
+                .andExpect(jsonPath("$.error.status", is("NOT_FOUND")))
+                .andExpect(jsonPath("$.error.message", is("Not Found")))
+                .andExpect(jsonPath("$.error.subErrors", Matchers.notNullValue()))
+                .andExpect(jsonPath("$.error.subErrors", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.error.subErrors[0]", Matchers.notNullValue()))
+                .andExpect(jsonPath("$.error.subErrors[0].rejectedValue", Matchers.notNullValue()))
+                .andExpect(jsonPath("$.error.subErrors[0].rejectedValue", is(user_userId)))
+        ;
+    }
+
+    @Test
     public void findUser_Unauthorized_Test() throws Exception {
         final String user_userId = "01e3d8d5-1119-4111-b3d0-be6562ca5901";
 
