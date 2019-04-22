@@ -53,7 +53,7 @@ public class UsersWebServiceIT {
 
     @Test
     public void findAllUsers_Success_Test() throws Exception {
-        String access_token = getUserAccessToken(mockMvc, "admin","password");
+        final String access_token = getUserAccessToken(mockMvc, "admin","password");
 
         mockMvc.perform(get("/ws/secured/users")
                 .header("Authorization", "Bearer " + access_token)
@@ -83,12 +83,12 @@ public class UsersWebServiceIT {
 
     @Test
     public void findAllUsers_Forbidden_Test() throws Exception {
-        String access_token = getUserAccessToken(mockMvc, "user","password");
+        final String access_token = getUserAccessToken(mockMvc, "user","password");
 
         mockMvc.perform(get("/ws/secured/users")
                 .header("Authorization", "Bearer " + access_token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isForbidden())
+                .andExpect(status().isForbidden())   //  403
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.error", Matchers.notNullValue()))
                 .andExpect(jsonPath("$.data").doesNotExist())
@@ -98,7 +98,7 @@ public class UsersWebServiceIT {
 
     @Test
     public void findMe_Success_Test() throws Exception {
-        String access_token = getUserAccessToken(mockMvc, "user", "password");
+        final String access_token = getUserAccessToken(mockMvc, "user", "password");
 
         final String user_userId = "01e3d8d5-1119-4111-b3d0-be6562ca5901";
         final boolean user_active = true;
@@ -128,6 +128,63 @@ public class UsersWebServiceIT {
         mockMvc.perform(get("/ws/authenticated/users/me")
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isUnauthorized())   //  401
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.error", Matchers.notNullValue()))
+                .andExpect(jsonPath("$.data").doesNotExist())
+        ;
+    }
+
+
+    @Test
+    public void findUser_Success_Test() throws Exception {
+        final String access_token = getUserAccessToken(mockMvc, "admin","password");
+
+        final String user_userId = "01e3d8d5-1119-4111-b3d0-be6562ca5901";
+        final boolean user_active = true;
+        final String user_email = "user@user.com";
+        final String user_username = "user";
+        final String user_name = "Some User";
+        final String user_lastName = "User User";
+
+        mockMvc.perform(get(String.format("/ws/secured/users/%s", user_userId))
+                .header("Authorization", "Bearer " + access_token)
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.data", Matchers.notNullValue()))
+                .andExpect(jsonPath("$.error").doesNotExist())
+                .andExpect(jsonPath("$.data.userId", is(user_userId)))
+                .andExpect(jsonPath("$.data.active", is(user_active)))
+                .andExpect(jsonPath("$.data.email", is(user_email)))
+                .andExpect(jsonPath("$.data.username", is(user_username)))
+                .andExpect(jsonPath("$.data.name", is(user_name)))
+                .andExpect(jsonPath("$.data.lastName", is(user_lastName)))
+        ;
+    }
+
+    @Test
+    public void findUser_Unauthorized_Test() throws Exception {
+        final String user_userId = "01e3d8d5-1119-4111-b3d0-be6562ca5901";
+
+        mockMvc.perform(get(String.format("/ws/secured/users/%s", user_userId))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isUnauthorized())   //  401
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.error", Matchers.notNullValue()))
+                .andExpect(jsonPath("$.data").doesNotExist())
+        ;
+    }
+
+    @Test
+    public void findUser_Forbidden_Test() throws Exception {
+        final String access_token = getUserAccessToken(mockMvc, "user","password");
+
+        final String user_userId = "01e3d8d5-1119-4111-b3d0-be6562ca5901";
+
+        mockMvc.perform(get(String.format("/ws/secured/users/%s", user_userId))
+                .header("Authorization", "Bearer " + access_token)
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isForbidden())   //  403
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.error", Matchers.notNullValue()))
                 .andExpect(jsonPath("$.data").doesNotExist())
