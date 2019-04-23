@@ -1,5 +1,6 @@
 package com.grayraccoon.sample.authms.ws;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grayraccoon.sample.authdomain.domain.Users;
 import com.grayraccoon.sample.authms.AuthMsApplication;
 import com.grayraccoon.sample.authms.services.UserService;
@@ -9,6 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -30,6 +32,7 @@ import static com.grayraccoon.sample.authms.config.AuthUtils.getOauthTestAuthent
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -239,5 +242,83 @@ public class UsersWebServiceTests {
         ;
     }
 
+    @Test
+    public void createUser_Success_Test() throws Exception {
+        final ObjectMapper mapper = new ObjectMapper();
+
+        final String user_userId = "01a0a0a0-1110-1099-a0a0-aa0990aa0666";
+        final boolean user_active = true;
+        final String user_email = "new@user.com";
+        final String user_username = "mock";
+        final String user_name = "Some User";
+        final String user_lastName = "User New";
+        final String user_password = "Some_password";
+
+        Mockito.when(userService.createUser(ArgumentMatchers.isA(Users.class)))
+                .thenReturn(Users.builder()
+                        .userId(UUID.fromString(user_userId))
+                        .active(user_active)
+                        .name(user_name)
+                        .lastName(user_lastName)
+                        .email(user_email)
+                        .username(user_username)
+                        .password(null)
+                        .build());
+
+        final Users userRequestBody = Users.builder()
+                .userId(null)
+                .name(user_name)
+                .lastName(user_lastName)
+                .username(user_username)
+                .email(user_email)
+                .password(user_password)
+                .build();
+
+        final String user_req_body_str = mapper.writeValueAsString(userRequestBody);
+
+        SecurityContextHolder.getContext().setAuthentication(getOauthTestAuthentication());
+        mockMvc.perform(post("/ws/users")
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .content(user_req_body_str)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.data", Matchers.notNullValue()))
+                .andExpect(jsonPath("$.error").doesNotExist())
+                .andExpect(jsonPath("$.data.userId", is(user_userId)))
+                .andExpect(jsonPath("$.data.active", is(user_active)))
+                .andExpect(jsonPath("$.data.email", is(user_email)))
+                .andExpect(jsonPath("$.data.username", is(user_username)))
+                .andExpect(jsonPath("$.data.name", is(user_name)))
+                .andExpect(jsonPath("$.data.lastName", is(user_lastName)))
+                .andExpect(jsonPath("$.data.password").doesNotExist())
+        ;
+    }
+
+    @Test
+    public void createUser_Failed_Test() throws Exception {
+        final ObjectMapper mapper = new ObjectMapper();
+        final String exceptionMessage = "Some Internal Error.";
+
+        expectedException.expectCause(isA(RuntimeException.class));
+        expectedException.expectMessage(exceptionMessage);
+
+        Mockito.when(userService.createUser(ArgumentMatchers.isA(Users.class)))
+                .thenThrow(
+                        new RuntimeException(exceptionMessage)
+                );
+
+        final Users userRequestBody = Users.builder().build();
+        final String user_req_body_str = mapper.writeValueAsString(userRequestBody);
+
+        SecurityContextHolder.getContext().setAuthentication(getOauthTestAuthentication());
+        mockMvc.perform(post("/ws/users")
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .content(user_req_body_str)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+        ;
+
+    }
 
 }
