@@ -9,6 +9,9 @@ case ${option} in
         docker network inspect SpringCloudNetwork &> /dev/null || docker network create SpringCloudNetwork
 
         docker run -p 9411:9411     \
+            --env STORAGE_TYPE=elasticsearch    \
+            --env ES_HOSTS=elasticsearchserver  \
+            --env ES_HTTP_LOGGING=BODY      \
             --net SpringCloudNetwork    \
             --name ZipkinServer     \
             -d openzipkin/zipkin
