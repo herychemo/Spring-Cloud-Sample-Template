@@ -28,9 +28,8 @@ public class AccountsEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @org.hibernate.annotations.Type(type = "org.hibernate.type.UUIDCharType")
-    @Column(name = "account_id", nullable = false, updatable = false, length = 42)
+    @Column(name = "account_id", nullable = false, length = 42)
     private UUID accountId;
 
     @Basic(optional = false)

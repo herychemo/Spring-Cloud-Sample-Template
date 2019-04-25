@@ -77,17 +77,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Accounts createAccount(Accounts accounts) {
         LOGGER.info("createAccount: {}", accounts.getFullName());
-        if (accounts.getAccountId() != null) {
-            throw new CustomApiException(
-                    ApiError.builder()
-                            .status(HttpStatus.BAD_REQUEST)
-                            .subError(new ApiValidationError(
-                                    "accountId",
-                                    accounts.getAccountId().toString(),
-                                    "New account must not send accountId."))
-                            .build()
-            );
-        }
 
         // set any default value for new AccountsEntity
 
@@ -200,7 +189,14 @@ public class AccountServiceImpl implements AccountService {
         Set<ApiValidationError> errors = new HashSet<>();
 
         // Custom Manual Validations
-        //
+
+        if (accountsEntity.getAccountId() == null) {
+            errors.add(new ApiValidationError(
+                    "accountId",
+                    null,
+                    "Account must have an Id."));
+        }
+
 
         // Validations from annotations
         errors.addAll(
