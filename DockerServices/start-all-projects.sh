@@ -15,8 +15,7 @@ sleep 4
 docker run -p 8761:8761     \
     --name EurekaServer     \
     --net SpringCloudNetwork    \
-    -e SPRING_PROFILES_ACTIVE=local \
-    -e CONFIG_SERVER=http://ConfigServer:8888 \
+    -e SPRING_PROFILES_ACTIVE=dockercli \
     -d herychemo/sample-cloud-eureka-server:0.0.1-SNAPSHOT
 
 sleep 1
