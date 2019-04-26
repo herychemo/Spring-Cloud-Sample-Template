@@ -17,6 +17,10 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
+
+		<dockerfile-maven-version>1.4.10</dockerfile-maven-version>
+		<docker-repository>herychemo</docker-repository>
+		<docker-image-name>sample-cloud-eureka-server</docker-image-name>
 	</properties>
 
 	<dependencies>
@@ -51,12 +55,37 @@
 	</dependencyManagement>
 
 	<build>
+        <finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+				<version>${dockerfile-maven-version}</version>
+				<executions>
+					<execution>
+						<id>default</id>
+						<goals>
+							<goal>build</goal>
+							<goal>tag</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<repository>${docker-repository}/${docker-image-name}</repository>
+					<tag>${project.version}</tag>
+					<buildArgs>
+						<JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+					</buildArgs>
+				</configuration>
+			</plugin>
+
 		</plugins>
+
 	</build>
 
 	<repositories>
