@@ -10,7 +10,7 @@ spring:
     config:
       enabled: true
       name: UiGateway
-      uri: http://localhost:8888
+      uri: ${CONFIG_SERVER:http://localhost:8888}
 logging:
   config: ${spring.cloud.config.uri}/${spring.cloud.config.name}/${spring.profiles.active:default}/master/logback-spring.xml
   file: ${java.io.tmpdir}/logs/${spring.application.name}.log

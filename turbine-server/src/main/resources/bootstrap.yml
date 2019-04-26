@@ -5,6 +5,6 @@ spring:
     config:
       enabled: true
       name: turbine-server
-      uri: http://localhost:8888
+      uri: ${CONFIG_SERVER:http://localhost:8888}
 logging:
   file: ${java.io.tmpdir}/logs/${spring.application.name}.log
