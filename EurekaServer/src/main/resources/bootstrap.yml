@@ -1,7 +1,7 @@
 #Configuration Server should overwrite this properties.
 spring.cloud.config.enabled: false
 ---
-spring.profiles: dev,qa,perf,prod
+spring.profiles: local,dockercli,dev,qa,perf,prod
 spring:
   application:
     name: eureka-server
