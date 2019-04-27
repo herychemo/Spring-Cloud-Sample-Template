@@ -1,6 +1,8 @@
 #!/bin/sh
 
-docker images -qa -f 'dangling=true' || docker rmi $(docker images -qa -f 'dangling=true')
+
+docker rmi $(docker images -qa -f 'dangling=true')
+
 
 docker network inspect SpringCloudNetwork &> /dev/null || docker network create SpringCloudNetwork
 
