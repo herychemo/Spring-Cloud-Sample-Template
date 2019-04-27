@@ -35,6 +35,8 @@ services:
     image: kibana:6.6.1
     container_name: kibanaserver
     hostname: kibanaserver
+    environment:
+      - ELASTICSEARCH_URL=http://tasks.elasticsearchserver:9200
     ports:
       - 5601:5601
     volumes:
@@ -53,6 +55,9 @@ services:
     image: logstash:6.6.1
     container_name: logstashserver
     hostname: logstashserver
+    environment:
+      - RABBIT_MQ_HOST=tasks.RabbitMQ-Server
+      - ELASTICSEARCH_HOST=tasks.elasticsearchserver
     ports:
       - 5000:5000
     volumes:
@@ -113,7 +118,7 @@ services:
     container_name: EurekaServer
     hostname: EurekaServer
     environment:
-      - SPRING_PROFILES_ACTIVE=dockercli
+      - SPRING_PROFILES_ACTIVE=swarm
     ports:
       - 8761:8761
     depends_on:

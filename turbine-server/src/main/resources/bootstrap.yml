@@ -11,3 +11,6 @@ logging:
 ---
 spring.profiles: dockercli
 spring.cloud.config.uri: http://ConfigServer:8888
+---
+spring.profiles: swarm
+spring.cloud.config.uri: http://tasks.ConfigServer:8888
