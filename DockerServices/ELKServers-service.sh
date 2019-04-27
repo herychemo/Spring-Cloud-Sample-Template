@@ -25,7 +25,7 @@ case ${option} in
             --net SpringCloudNetwork        \
             --name kibanaserver             \
             -e ELASTICSEARCH_URL=http://elasticsearchserver:9200    \
-            -v "$C_DIR\\conf\\kibana.yml:/usr/share/kibana/config/kibana.yml"  \
+            -v "$C_DIR\\conf\\kibana\\config\\kibana.yml:/usr/share/kibana/config/kibana.yml"  \
             -d kibana:6.6.1
 
          docker run -p 5000:5000            \
@@ -33,8 +33,8 @@ case ${option} in
             --name logstashserver           \
             -e RABBIT_MQ_HOST=RabbitMQ-Server       \
             -e ELASTICSEARCH_HOST=elasticsearchserver   \
-            -v "$C_DIR\\conf\\logstash.yml:/usr/share/logstash/config/logstash.yml"  \
-            -v "$C_DIR\\conf\\logstash_pipelines\\:/usr/share/logstash/pipeline/"      \
+            -v "$C_DIR\\conf\\logstash\\config\\logstash.yml:/usr/share/logstash/config/logstash.yml"  \
+            -v "$C_DIR\\conf\\logstash\\pipeline\\:/usr/share/logstash/pipeline/"      \
             -d -it logstash:6.6.1
 
     ;;
