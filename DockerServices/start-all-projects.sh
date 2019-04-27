@@ -37,7 +37,7 @@ docker run -p 8081:8081     \
 sleep 6
 
 docker run -p 9003:9003     \
-    --name TurbineServer     \
+    --name turbine-server     \
     --net SpringCloudNetwork    \
     -e SPRING_PROFILES_ACTIVE=dockercli \
     -d herychemo/sample-cloud-turbine-server:0.0.1-SNAPSHOT

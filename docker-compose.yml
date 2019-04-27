@@ -1,0 +1,146 @@
+version: "3.3"
+
+services:
+
+  RabbitMQ-Server:
+    image: rabbitmq:3.7-rc-management-alpine
+    container_name: RabbitMQ-Server
+    hostname: RabbitMQ-Server
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+
+  elasticsearchserver:
+    image: elasticsearch:6.6.1
+    container_name: elasticsearchserver
+    hostname: elasticsearchserver
+    environment:
+      - "discovery.type=single-node"
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+
+  kibanaserver:
+    image: kibana:6.6.1
+    container_name: kibanaserver
+    hostname: kibanaserver
+    ports:
+      - 5601:5601
+    volumes:
+      - "./DockerServices/conf/kibana.yml:/usr/share/kibana/config/kibana.yml"
+    depends_on:
+      - elasticsearchserver
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+
+  logstashserver:
+    image: logstash:6.6.1
+    container_name: logstashserver
+    hostname: logstashserver
+    ports:
+      - 5000:5000
+    volumes:
+      - "./DockerServices/conf/logstash.yml:/usr/share/logstash/config/logstash.yml"
+      - "./DockerServices/conf/logstash_pipelines/:/usr/share/logstash/pipeline/"
+    depends_on:
+      - RabbitMQ-Server
+      - elasticsearchserver
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+
+  ZipkinServer:
+    image: openzipkin/zipkin
+    container_name: ZipkinServer
+    hostname: ZipkinServer
+    environment:
+      - STORAGE_TYPE=elasticsearch
+      - ES_HOSTS=elasticsearchserver
+      - ES_HTTP_LOGGING=BODY
+    ports:
+      - 9411:9411
+    depends_on:
+      - elasticsearchserver
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+
+
+  ConfigServer:
+    build:
+      context: ./ConfigServer/
+      dockerfile: Dockerfile
+      args:
+        - JAR_FILE=ConfigServer.jar
+    image: herychemo/sample-cloud-config-server:0.0.1-SNAPSHOT
+    container_name: ConfigServer
+    hostname: ConfigServer
+    ports:
+      - 8888:8888
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+
+  EurekaServer:
+    build:
+      context: ./EurekaServer/
+      dockerfile: Dockerfile
+        args:
+          - JAR_FILE=EurekaServer.jar
+    image: herychemo/sample-cloud-eureka-server:0.0.1-SNAPSHOT
+    container_name: EurekaServer
+    hostname: EurekaServer
+    environment:
+      - SPRING_PROFILES_ACTIVE=dockercli
+    ports:
+      - 8761:8761
+    depends_on:
+      - ConfigServer
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+
+
+  dashboard:
+    image: charypar/swarm-dashboard
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    ports:
+      - 8082:8082
+    environment:
+      PORT: 8082
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  SpringCloudNetwork:
