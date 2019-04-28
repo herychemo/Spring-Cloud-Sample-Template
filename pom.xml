@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
 
     <name>Spring-Cloud-Sample-Template</name>
-    <description>This is a Simple Spring Cloud Microservices Stack Sample Template.</description>
+    <description>This is a Simple Spring Cloud MicroServices Stack Sample Template.</description>
 
     <modules>
         <module>Web-Utils</module>

@@ -1,5 +1,5 @@
 # Spring-Cloud-Sample-Template
-This is a Simple Spring Cloud Microservices Stack Sample Template.
+This is a Simple Spring Cloud MicroServices Stack Sample Template.
 
 **_Work in progress_**
 
