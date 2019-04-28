@@ -49,7 +49,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.role == worker
+          - node.role == master
 
   logstashserver:
     image: logstash:7.0.0
@@ -72,7 +72,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.role == worker
+          - node.role == master
 
   ZipkinServer:
     image: openzipkin/zipkin
@@ -90,6 +90,9 @@ services:
       - SpringCloudNetwork
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
 
 
   ConfigServer:
