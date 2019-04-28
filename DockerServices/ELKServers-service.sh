@@ -24,7 +24,8 @@ case ${option} in
         docker run -p 5601:5601             \
             --net SpringCloudNetwork        \
             --name kibanaserver             \
-            -e ELASTICSEARCH_URL=http://elasticsearchserver:9200    \
+            -e ELASTICSEARCH_URL=http://tasks.elasticsearchserver:9200      \
+            -e ELASTICSEARCH_HOSTS=http://tasks.elasticsearchserver:9200    \
             -v "$C_DIR\\conf\\kibana\\config\\kibana.yml:/usr/share/kibana/config/kibana.yml"  \
             -d kibana:7.0.0
 

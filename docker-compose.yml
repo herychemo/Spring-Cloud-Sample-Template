@@ -95,6 +95,24 @@ services:
         constraints:
           - node.role == worker
 
+  PostgresDatabase:
+    image: postgres:11.2
+    container_name: PostgresDatabase
+    hostname: PostgresDatabase
+    environment:
+      - POSTGRES_PASSWORD=rootroot
+      - POSTGRES_USER=dbo_admin
+      - POSTGRES_DB=cloud_db
+    ports:
+      - 5432:5432
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+
 
   ConfigServer:
     build:
@@ -135,6 +153,30 @@ services:
         constraints:
           - node.role == manager
 
+  auth-ms:
+    build:
+      context: ./AuthMs/
+      dockerfile: Dockerfile
+      args:
+        - JAR_FILE=auth-ms.jar
+    image: herychemo/sample-cloud-auth-ms:0.0.1-SNAPSHOT
+      container_name: Auth-Ms
+      hostname: Auth-Ms
+      environment:
+        - SPRING_PROFILES_ACTIVE=swarm
+      ports:
+        - 9869:9869
+      depends_on:
+        - ConfigServer
+        - EurekaServer
+        - ZipkinServer
+        - logstashserver
+        - RabbitMQ-Server
+        - PostgresDatabase
+      networks:
+        - SpringCloudNetwork
+      deploy:
+        replicas: 1
 
 
   dashboard:
