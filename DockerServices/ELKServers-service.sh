@@ -7,9 +7,9 @@ case ${option} in
     start)
         echo "Performing: start"
 
-        docker pull elasticsearch:6.6.1
-        docker pull kibana:6.6.1
-        docker pull logstash:6.6.1
+        docker pull elasticsearch:7.0.0
+        docker pull kibana:7.0.0
+        docker pull logstash:7.0.0
 
         docker network inspect SpringCloudNetwork &> /dev/null || docker network create SpringCloudNetwork
 
@@ -18,7 +18,7 @@ case ${option} in
             --net SpringCloudNetwork        \
             --name elasticsearchserver      \
             -e "discovery.type=single-node" \
-            -d elasticsearch:6.6.1
+            -d elasticsearch:7.0.0
             #-v LOCAL_FOLDER:/usr/share/elasticsearch/data  \
 
         docker run -p 5601:5601             \
@@ -26,7 +26,7 @@ case ${option} in
             --name kibanaserver             \
             -e ELASTICSEARCH_URL=http://elasticsearchserver:9200    \
             -v "$C_DIR\\conf\\kibana\\config\\kibana.yml:/usr/share/kibana/config/kibana.yml"  \
-            -d kibana:6.6.1
+            -d kibana:7.0.0
 
          docker run -p 5000:5000            \
             --net SpringCloudNetwork        \
@@ -35,7 +35,7 @@ case ${option} in
             -e ELASTICSEARCH_HOST=elasticsearchserver   \
             -v "$C_DIR\\conf\\logstash\\config\\logstash.yml:/usr/share/logstash/config/logstash.yml"  \
             -v "$C_DIR\\conf\\logstash\\pipeline\\:/usr/share/logstash/pipeline/"      \
-            -d -it logstash:6.6.1
+            -d -it logstash:7.0.0
 
     ;;
     stop)

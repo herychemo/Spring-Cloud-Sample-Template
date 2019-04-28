@@ -15,7 +15,7 @@ services:
       replicas: 1
 
   elasticsearchserver:
-    image: elasticsearch:6.6.1
+    image: elasticsearch:7.0.0
     container_name: elasticsearchserver
     hostname: elasticsearchserver
     environment:
@@ -32,7 +32,7 @@ services:
           - node.role == worker
 
   kibanaserver:
-    image: kibana:6.6.1
+    image: kibana:7.0.0
     container_name: kibanaserver
     hostname: kibanaserver
     environment:
@@ -40,7 +40,7 @@ services:
     ports:
       - 5601:5601
     volumes:
-      - kibana-config:/usr/share/kibana/config
+      - ${PWD}/DockerServices/conf/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:
       - elasticsearchserver
     networks:
@@ -52,7 +52,7 @@ services:
           - node.role == worker
 
   logstashserver:
-    image: logstash:6.6.1
+    image: logstash:7.0.0
     container_name: logstashserver
     hostname: logstashserver
     environment:
@@ -61,7 +61,7 @@ services:
     ports:
       - 5000:5000
     volumes:
-      - logstash-config:/usr/share/logstash/config
+      - ${PWD}/DockerServices/conf/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
       - logstash-pipeline:/usr/share/logstash/pipeline
     depends_on:
       - RabbitMQ-Server
@@ -148,16 +148,6 @@ services:
           - node.role == manager
 
 volumes:
-  kibana-config:
-    driver_opts:
-      type: none
-      device: ${PWD}/DockerServices/conf/kibana/config
-      o: bind
-  logstash-config:
-    driver_opts:
-      type: none
-      device: ${PWD}/DockerServices/conf/logstash/config
-      o: bind
   logstash-pipeline:
     driver_opts:
       type: none
