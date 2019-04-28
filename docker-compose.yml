@@ -37,6 +37,7 @@ services:
     hostname: kibanaserver
     environment:
       - ELASTICSEARCH_URL=http://tasks.elasticsearchserver:9200
+      - ELASTICSEARCH_HOSTS=http://tasks.elasticsearchserver:9200
     ports:
       - 5601:5601
     volumes:
