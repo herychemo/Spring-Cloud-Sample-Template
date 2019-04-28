@@ -160,23 +160,23 @@ services:
       args:
         - JAR_FILE=auth-ms.jar
     image: herychemo/sample-cloud-auth-ms:0.0.1-SNAPSHOT
-      container_name: Auth-Ms
-      hostname: Auth-Ms
-      environment:
-        - SPRING_PROFILES_ACTIVE=swarm
-      ports:
-        - 9869:9869
-      depends_on:
-        - ConfigServer
-        - EurekaServer
-        - ZipkinServer
-        - logstashserver
-        - RabbitMQ-Server
-        - PostgresDatabase
-      networks:
-        - SpringCloudNetwork
-      deploy:
-        replicas: 1
+    container_name: Auth-Ms
+    hostname: Auth-Ms
+    environment:
+      - SPRING_PROFILES_ACTIVE=swarm
+    ports:
+      - 9869:9869
+    depends_on:
+      - ConfigServer
+      - EurekaServer
+      - ZipkinServer
+      - logstashserver
+      - RabbitMQ-Server
+      - PostgresDatabase
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
 
 
   dashboard:
