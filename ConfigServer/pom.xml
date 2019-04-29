@@ -19,7 +19,7 @@
 		<spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
 
 		<dockerfile-maven-version>1.4.10</dockerfile-maven-version>
-		<docker-repository>herychemo</docker-repository>
+		<docker-repository>grayraccoon</docker-repository>
 		<docker-image-name>sample-cloud-config-server</docker-image-name>
 	</properties>
 
