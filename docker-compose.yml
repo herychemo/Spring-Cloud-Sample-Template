@@ -81,7 +81,7 @@ services:
     hostname: ZipkinServer
     environment:
       - STORAGE_TYPE=elasticsearch
-      - ES_HOSTS=elasticsearchserver
+      - ES_HOSTS=tasks.elasticsearchserver
       - ES_HTTP_LOGGING=BODY
     ports:
       - 9411:9411
