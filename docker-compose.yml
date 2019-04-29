@@ -209,8 +209,8 @@ services:
       args:
         - JAR_FILE=turbine-server.jar
     image: grayraccoon/sample-cloud-turbine-server:0.0.1-SNAPSHOT
-    container_name: turbine-server
-    hostname: turbine-server
+    container_name: Turbine-Server
+    hostname: Turbine-Server
     environment:
       - SPRING_PROFILES_ACTIVE=swarm
     ports:
@@ -248,8 +248,74 @@ services:
     deploy:
       replicas: 1
 
+  HystrixDashboard:
+    build:
+      context: ./HystrixDashboard/
+      dockerfile: Dockerfile
+      args:
+        - JAR_FILE=HystrixDashboard.jar
+    image: grayraccoon/sample-cloud-hystrix-dashboard:0.0.1-SNAPSHOT
+    container_name: HystrixDashboard
+    hostname: HystrixDashboard
+    environment:
+      - SPRING_PROFILES_ACTIVE=swarm
+    ports:
+      - 9002:9002
+    depends_on:
+      - ConfigServer
+      - EurekaServer
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
 
+  SpringAdminServer:
+    build:
+      context: ./SpringAdminServer/
+      dockerfile: Dockerfile
+      args:
+        - JAR_FILE=SpringAdminServer.jar
+    image: grayraccoon/sample-cloud-spring-admin-server:0.0.1-SNAPSHOT
+    container_name: SpringAdminServer
+    hostname: SpringAdminServer
+    environment:
+      - SPRING_PROFILES_ACTIVE=swarm
+    ports:
+      - 8760:8760
+    depends_on:
+      - ConfigServer
+      - EurekaServer
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
 
+  ui-gateway:
+    build:
+      context: ./ui-gateway/
+      dockerfile: Dockerfile
+      args:
+        - JAR_FILE=ui-gateway.jar
+    image: grayraccoon/sample-cloud-ui-gateway:0.0.1-SNAPSHOT
+    container_name: UI-Gateway
+    hostname: UI-Gateway
+    environment:
+      - SPRING_PROFILES_ACTIVE=swarm
+    ports:
+      - 8080:8080
+    depends_on:
+      - ConfigServer
+      - EurekaServer
+      - ZipkinServer
+      - logstashserver
+      - RabbitMQ-Server
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
 
 
   dashboard:
@@ -266,12 +332,14 @@ services:
         constraints:
           - node.role == manager
 
+
 volumes:
   logstash-pipeline:
     driver_opts:
       type: none
       device: ${PWD}/DockerServices/conf/logstash/pipeline
       o: bind
+
 
 networks:
   SpringCloudNetwork:
