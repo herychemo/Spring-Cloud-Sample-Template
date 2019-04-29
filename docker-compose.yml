@@ -120,7 +120,7 @@ services:
       dockerfile: Dockerfile
       args:
         - JAR_FILE=ConfigServer.jar
-    image: herychemo/sample-cloud-config-server:0.0.1-SNAPSHOT
+    image: grayraccoon/sample-cloud-config-server:0.0.1-SNAPSHOT
     container_name: ConfigServer
     hostname: ConfigServer
     ports:
@@ -136,7 +136,7 @@ services:
       dockerfile: Dockerfile
       args:
         - JAR_FILE=EurekaServer.jar
-    image: herychemo/sample-cloud-eureka-server:0.0.1-SNAPSHOT
+    image: grayraccoon/sample-cloud-eureka-server:0.0.1-SNAPSHOT
     container_name: EurekaServer
     hostname: EurekaServer
     environment:
@@ -159,7 +159,7 @@ services:
       dockerfile: Dockerfile
       args:
         - JAR_FILE=auth-ms.jar
-    image: herychemo/sample-cloud-auth-ms:0.0.1-SNAPSHOT
+    image: grayraccoon/sample-cloud-auth-ms:0.0.1-SNAPSHOT
     container_name: Auth-Ms
     hostname: Auth-Ms
     environment:
@@ -184,7 +184,7 @@ services:
       dockerfile: Dockerfile
       args:
         - JAR_FILE=ZuulApiProxy.jar
-    image: herychemo/sample-cloud-zuul-api-proxy:0.0.1-SNAPSHOT
+    image: grayraccoon/sample-cloud-zuul-api-proxy:0.0.1-SNAPSHOT
     container_name: ZuulApiProxy
     hostname: ZuulApiProxy
     environment:
