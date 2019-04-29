@@ -226,3 +226,8 @@ volumes:
 
 networks:
   SpringCloudNetwork:
+
+
+# Quick reference commands:
+# docker stack deploy -c docker-compose.yml cloud
+# clear && docker stack services cloud && echo && docker stack ps cloud && echo && docker ps -a
