@@ -15,7 +15,7 @@ services:
       replicas: 1
 
   elasticsearchserver:
-    image: elasticsearch:7.0.0
+    image: elasticsearch:6.6.1
     container_name: elasticsearchserver
     hostname: elasticsearchserver
     environment:
@@ -32,7 +32,7 @@ services:
           - node.role == worker
 
   kibanaserver:
-    image: kibana:7.0.0
+    image: kibana:6.6.1
     container_name: kibanaserver
     hostname: kibanaserver
     environment:
@@ -53,7 +53,7 @@ services:
           - node.role == manager
 
   logstashserver:
-    image: logstash:7.0.0
+    image: logstash:6.6.1
     container_name: logstashserver
     hostname: logstashserver
     environment:
