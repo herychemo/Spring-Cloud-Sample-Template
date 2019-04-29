@@ -202,6 +202,55 @@ services:
     deploy:
       replicas: 1
 
+  turbine-server:
+    build:
+      context: ./turbine-server/
+      dockerfile: Dockerfile
+      args:
+        - JAR_FILE=turbine-server.jar
+    image: grayraccoon/sample-cloud-turbine-server:0.0.1-SNAPSHOT
+    container_name: turbine-server
+    hostname: turbine-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=swarm
+    ports:
+      - 9003:9003
+    depends_on:
+      - ConfigServer
+      - EurekaServer
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+
+  accounts-ms:
+    build:
+      context: ./AccountsMs/
+      dockerfile: Dockerfile
+      args:
+        - JAR_FILE=accounts-ms.jar
+    image: grayraccoon/sample-cloud-accounts-ms:0.0.1-SNAPSHOT
+    container_name: Accounts-Ms
+    hostname: Accounts-Ms
+    environment:
+      - SPRING_PROFILES_ACTIVE=swarm
+    ports:
+      - 9871:9871
+    depends_on:
+      - ConfigServer
+      - EurekaServer
+      - ZipkinServer
+      - logstashserver
+      - RabbitMQ-Server
+      - PostgresDatabase
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+
+
+
+
 
   dashboard:
     image: charypar/swarm-dashboard
