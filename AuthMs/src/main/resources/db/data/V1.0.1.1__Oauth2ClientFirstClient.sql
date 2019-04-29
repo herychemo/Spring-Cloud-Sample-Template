@@ -18,6 +18,7 @@ VALUES (
         'read,write,user_info', 'password,authorization_code,refresh_token,client_credentials',
 
         'http://localhost:8080/login/oauth2/code/custom-client' --  API Gateway UI
+            || ',http://swarm-master0:8080/login/oauth2/code/custom-client'
         ,
 
         'ROLE_ACTUATOR', 36000, 360000, null, true);
