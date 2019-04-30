@@ -21,6 +21,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
+import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -106,6 +107,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public TokenStore tokenStore() {
         return new JdbcTokenStore(postgresDataSource);
+    }
+
+    @Bean
+    public JdbcAuthorizationCodeServices jdbcAuthorizationCodeServices() {
+        return new JdbcAuthorizationCodeServices(postgresDataSource);
     }
 
     @Bean

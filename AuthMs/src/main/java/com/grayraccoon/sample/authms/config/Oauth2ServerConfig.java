@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
+import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -26,6 +27,9 @@ public class Oauth2ServerConfig extends AuthorizationServerConfigurerAdapter {
 
     @Autowired
     private TokenStore tokenStore;
+
+    @Autowired
+    private AuthorizationCodeServices authorizationCodeServices;
 
     @Autowired
     private DataSource postgresDataSource;
@@ -74,6 +78,7 @@ public class Oauth2ServerConfig extends AuthorizationServerConfigurerAdapter {
 
         endpoints.tokenStore(tokenStore)
                 .approvalStore(approvalStore)
+                .authorizationCodeServices(authorizationCodeServices)
                 .accessTokenConverter(accessTokenConverter)
                 .tokenEnhancer(tokenEnhancerChain)
                 .authenticationManager(authenticationManager)
