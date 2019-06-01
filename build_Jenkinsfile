@@ -1,0 +1,76 @@
+#!/usr/bin/env groovy
+
+pipeline {
+
+    environment {
+        WORKSPACE = "${pwd()}"
+    }
+
+    agent {
+        docker {
+            // mount maven repo volume.
+            args '-v /root/.m2:/root/.m2'
+            image 'maven:3-alpine'
+        }
+    }
+
+    stages {
+
+        stage("Checkout") {
+            steps {
+                // Git checkout with submodules enabled!
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']],
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [[$class: 'SubmoduleOption', disableSubmodules: false,
+                                        parentCredentials: true, recursiveSubmodules: true,
+                                        reference: '', trackingSubmodules: false]],
+                          submoduleCfg: [],
+                          userRemoteConfigs: [[credentialsId: 'git-ssh',
+                                               url: 'git@gitlab.com:herychemo/Spring-Cloud-Sample-Template.git']]])
+            }
+        }
+
+        stage("Build") {
+            steps {
+                dir(WORKSPACE) {
+                    sh """
+                        mvn compile
+                    """
+                }
+            }
+        }
+
+        stage("Test") {
+            steps {
+                dir(WORKSPACE) {
+                    sh """
+                        mvn test
+                    """
+                }
+            }
+            post {
+                always {
+                    junit '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage ("Package") {
+            steps {
+                dir(WORKSPACE) {
+                    sh """
+                        mvn package -DskipTests
+                    """
+                }
+            }
+        }
+
+        stage("Archive") {
+            steps {
+                archiveArtifacts artifacts: "**/target/*.jar", onlyIfSuccessful: true
+            }
+        }
+
+    }
+
+}
