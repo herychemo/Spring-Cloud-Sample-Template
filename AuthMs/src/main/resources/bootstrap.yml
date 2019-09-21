@@ -1,15 +1,20 @@
+## default
+spring.profiles.include: standalone
+---
+## Copy this standalone section on your app bootstrap.yml
+spring.profiles: standalone
+
 #Configuration Server should overwrite this properties.
 eureka.client.enabled: false
 spring.cloud.config.enabled: false
 ---
-spring.profiles: local,dockercli,swarm,dev,qa,perf,prod
+spring.profiles: cloud
+
 spring:
-  application:
-    name: auth-ms
   cloud:
     config:
       enabled: true
-      name: auth-ms
+      name: ${spring.application.name}
       uri: ${CONFIG_SERVER:http://localhost:8888}
       fail-fast: true
       retry:
@@ -17,13 +22,40 @@ spring:
         initial-interval: 4000
         max-interval: 9000
         multiplier: 1.4
-
+---
+spring.profiles: base
+spring.application.name: auth-ms
 logging:
-  config: ${spring.cloud.config.uri}/${spring.cloud.config.name}/${spring.profiles.active:default}/master/logback-spring.xml
   file: ${java.io.tmpdir}/logs/${spring.application.name}.log
 ---
+spring.profiles: local,standalone,heroku,aws,dev
+spring.profiles.include: base
+---
+spring.profiles: local
+spring.profiles.main: local
+spring.profiles.include: standalone
+---
+spring.profiles: heroku
+spring.profiles.main: heroku
+spring.profiles.include: standalone
+---
+spring.profiles: aws
+spring.profiles.main: aws
+spring.profiles.include: standalone
+---
+spring.profiles: localdev
+spring.profiles.main: localdev
+spring.profiles.include: cloud,cloudlogback
+---
 spring.profiles: dockercli
+spring.profiles.main: dockercli
 spring.cloud.config.uri: http://ConfigServer:8888
 ---
 spring.profiles: swarm
+spring.profiles.main: swarm
 spring.cloud.config.uri: http://tasks.ConfigServer:8888
+---
+spring.profiles: cloudlogback
+logging:
+  config: ${spring.cloud.config.uri}/${spring.cloud.config.name}/${spring.profiles.main:base}/master/logback-spring.xml
+

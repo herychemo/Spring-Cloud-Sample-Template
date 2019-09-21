@@ -176,7 +176,7 @@ services:
     networks:
       - SpringCloudNetwork
     deploy:
-      replicas: 2
+      replicas: 1
 
   ZuulApiProxy:
     build:

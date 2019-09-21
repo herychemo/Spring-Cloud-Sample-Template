@@ -1,9 +1,10 @@
-package com.grayraccoon.sample.authms.services;
+package com.grayraccoon.sample.authms.services.impl;
 
 import com.grayraccoon.sample.authms.data.postgres.domain.RolesEntity;
 import com.grayraccoon.sample.authms.data.postgres.domain.UsersEntity;
 import com.grayraccoon.sample.authdomain.domain.Roles;
 import com.grayraccoon.sample.authdomain.domain.Users;
+import com.grayraccoon.sample.authms.services.MapperConverterService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-class MapperConverterServiceImpl implements MapperConverterService {
+public class MapperConverterServiceImpl implements MapperConverterService {
 
     @Override
     public Users createUserFromUsersEntity(UsersEntity user) {

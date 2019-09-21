@@ -1,0 +1,130 @@
+version: "3.3"
+
+services:
+
+  RabbitMQ-Server:
+    image: rabbitmq:3.7-rc-management-alpine
+    container_name: RabbitMQ-Server
+    hostname: RabbitMQ-Server
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+
+  elasticsearchserver:
+    image: elasticsearch:6.6.1
+    container_name: elasticsearchserver
+    hostname: elasticsearchserver
+    environment:
+      - "discovery.type=single-node"
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+
+  kibanaserver:
+    image: kibana:6.6.1
+    container_name: kibanaserver
+    hostname: kibanaserver
+    environment:
+      - ELASTICSEARCH_URL=http://tasks.elasticsearchserver:9200
+      - ELASTICSEARCH_HOSTS=http://tasks.elasticsearchserver:9200
+    ports:
+      - 5601:5601
+    volumes:
+      - ${PWD}/DockerServices/conf/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+    depends_on:
+      - elasticsearchserver
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  logstashserver:
+    image: logstash:6.6.1
+    container_name: logstashserver
+    hostname: logstashserver
+    environment:
+      - RABBIT_MQ_HOST=tasks.RabbitMQ-Server
+      - ELASTICSEARCH_HOST=tasks.elasticsearchserver
+    ports:
+      - 5000:5000
+    volumes:
+      - ${PWD}/DockerServices/conf/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - logstash-pipeline:/usr/share/logstash/pipeline
+    depends_on:
+      - RabbitMQ-Server
+      - elasticsearchserver
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  ZipkinServer:
+    image: openzipkin/zipkin
+    container_name: ZipkinServer
+    hostname: ZipkinServer
+    environment:
+      - STORAGE_TYPE=elasticsearch
+      - ES_HOSTS=tasks.elasticsearchserver
+      - ES_HTTP_LOGGING=BODY
+    ports:
+      - 9411:9411
+    depends_on:
+      - elasticsearchserver
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+
+  PostgresDatabase:
+    image: postgres:11.2
+    container_name: PostgresDatabase
+    hostname: PostgresDatabase
+    environment:
+      - POSTGRES_PASSWORD=rootroot
+      - POSTGRES_USER=dbo_admin
+      - POSTGRES_DB=cloud_db
+    ports:
+      - 5432:5432
+    networks:
+      - SpringCloudNetwork
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+
+volumes:
+  logstash-pipeline:
+    driver_opts:
+      type: none
+      device: ${PWD}/DockerServices/conf/logstash/pipeline
+      o: bind
+
+
+networks:
+  SpringCloudNetwork:
+
+
+# Quick reference commands:
+# docker stack deploy -c docker-compose.yml cloud
+# clear && docker stack services cloud && echo && docker stack ps cloud && echo && docker ps -a

@@ -1,4 +1,4 @@
-package com.grayraccoon.sample.authms.services;
+package com.grayraccoon.sample.authms.services.impl;
 
 import com.grayraccoon.sample.authdomain.domain.PasswordUpdaterModel;
 import com.grayraccoon.sample.authdomain.domain.Roles;
@@ -7,6 +7,10 @@ import com.grayraccoon.sample.authms.data.postgres.domain.RolesEntity;
 import com.grayraccoon.sample.authms.data.postgres.domain.UsersEntity;
 import com.grayraccoon.sample.authms.data.postgres.repository.RolesRepository;
 import com.grayraccoon.sample.authms.data.postgres.repository.UsersRepository;
+import com.grayraccoon.sample.authms.services.CustomTokenOperationsService;
+import com.grayraccoon.sample.authms.services.MapperConverterService;
+import com.grayraccoon.sample.authms.services.UserEventsNotifierService;
+import com.grayraccoon.sample.authms.services.UserService;
 import com.grayraccoon.webutils.errors.ApiError;
 import com.grayraccoon.webutils.errors.ApiValidationError;
 import com.grayraccoon.webutils.exceptions.CustomApiException;
@@ -93,6 +97,21 @@ public class UserServiceImpl implements UserService {
                         .subError(new ApiValidationError(userId))
                         .build()
         );
+    }
+
+    @Override
+    public UsersEntity findByUsernameOrEmail(String query) {
+        LOGGER.info("findByUsernameOrEmail: {}", query);
+        final UsersEntity u = usersRepository.findFirstByEmailOrUsername(query, query);
+        if (u == null) {
+            throw new CustomApiException(
+                    ApiError.builder()
+                            .status(HttpStatus.NOT_FOUND)
+                            .subError(new ApiValidationError(query))
+                            .build()
+            );
+        }
+        return u;
     }
 
     @Transactional(readOnly = true)

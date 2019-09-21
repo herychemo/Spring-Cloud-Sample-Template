@@ -3,6 +3,7 @@ package com.grayraccoon.sample.authms.ws;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grayraccoon.sample.authdomain.domain.Users;
 import com.grayraccoon.sample.authms.AuthMsApplication;
+import com.grayraccoon.webutils.test.auth.Oauth2Utils;
 import org.assertj.core.api.Assertions;
 import org.flywaydb.core.Flyway;
 import org.hamcrest.Matchers;
@@ -22,7 +23,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Map;
 
-import static com.grayraccoon.sample.authms.config.AuthUtils.getUserAccessToken;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -39,6 +39,7 @@ public class UsersWebServiceIT {
     private WebApplicationContext wac;
 
     @Autowired
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     private FilterChainProxy springSecurityFilterChain;
 
     @Autowired
@@ -59,7 +60,7 @@ public class UsersWebServiceIT {
 
     @Test
     public void findAllUsers_Success_Test() throws Exception {
-        final String access_token = getUserAccessToken(mockMvc, "admin","password");
+        final String access_token = Oauth2Utils.getUserAccessToken(mockMvc, "admin","password");
 
         mockMvc.perform(get("/ws/secured/users")
                 .header("Authorization", "Bearer " + access_token)
@@ -89,7 +90,7 @@ public class UsersWebServiceIT {
 
     @Test
     public void findAllUsers_Forbidden_Test() throws Exception {
-        final String access_token = getUserAccessToken(mockMvc, "user","password");
+        final String access_token = Oauth2Utils.getUserAccessToken(mockMvc, "user","password");
 
         mockMvc.perform(get("/ws/secured/users")
                 .header("Authorization", "Bearer " + access_token)
@@ -104,7 +105,7 @@ public class UsersWebServiceIT {
 
     @Test
     public void findMe_Success_Test() throws Exception {
-        final String access_token = getUserAccessToken(mockMvc, "user", "password");
+        final String access_token = Oauth2Utils.getUserAccessToken(mockMvc, "user", "password");
 
         final String user_userId = "01e3d8d5-1119-4111-b3d0-be6562ca5901";
         final boolean user_active = true;
@@ -143,7 +144,7 @@ public class UsersWebServiceIT {
 
     @Test
     public void findUser_Success_Test() throws Exception {
-        final String access_token = getUserAccessToken(mockMvc, "admin","password");
+        final String access_token = Oauth2Utils.getUserAccessToken(mockMvc, "admin","password");
 
         final String user_userId = "01e3d8d5-1119-4111-b3d0-be6562ca5901";
         final boolean user_active = true;
@@ -170,7 +171,7 @@ public class UsersWebServiceIT {
 
     @Test
     public void findUser_NotFound_Test() throws Exception {
-        final String access_token = getUserAccessToken(mockMvc, "admin","password");
+        final String access_token = Oauth2Utils.getUserAccessToken(mockMvc, "admin","password");
 
         final String user_userId = "01e3d8d5-0009-4111-b3d0-be6562ca5922";
 
@@ -205,7 +206,7 @@ public class UsersWebServiceIT {
 
     @Test
     public void findUser_Forbidden_Test() throws Exception {
-        final String access_token = getUserAccessToken(mockMvc, "user","password");
+        final String access_token = Oauth2Utils.getUserAccessToken(mockMvc, "user","password");
 
         final String user_userId = "01e3d8d5-1119-4111-b3d0-be6562ca5901";
 
@@ -258,7 +259,7 @@ public class UsersWebServiceIT {
                 .andExpect(jsonPath("$.data.password").doesNotExist())
         ;
 
-        final String access_token = getUserAccessToken(mockMvc, user_username,user_password);
+        final String access_token = Oauth2Utils.getUserAccessToken(mockMvc, user_username,user_password);
         Assertions.assertThat(access_token).isNotNull();
         Assertions.assertThat(access_token).isNotBlank();
     }

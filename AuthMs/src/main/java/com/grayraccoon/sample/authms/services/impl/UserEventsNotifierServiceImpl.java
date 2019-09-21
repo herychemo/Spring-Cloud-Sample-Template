@@ -1,7 +1,8 @@
-package com.grayraccoon.sample.authms.services;
+package com.grayraccoon.sample.authms.services.impl;
 
 import com.grayraccoon.sample.authdomain.domain.Users;
 import com.grayraccoon.sample.authms.channels.ProducerUserEventsChannels;
+import com.grayraccoon.sample.authms.services.UserEventsNotifierService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

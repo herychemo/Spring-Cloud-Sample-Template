@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-import static com.grayraccoon.sample.accountsms.config.ResourceServerConfig.getExtraInfo;
+import static com.grayraccoon.webutils.config.components.CustomAccessTokenConverter.getExtraInfo;
 
 @RestController
 @RequestMapping("/ws")
