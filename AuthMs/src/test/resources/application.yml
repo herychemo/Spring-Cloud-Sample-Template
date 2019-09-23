@@ -1,26 +1,44 @@
 
 spring:
-  datasource:
-    test:
-      jdbc-url: jdbc:h2:mem:cloud_db;MODE=PostgreSQL;INIT=CREATE SCHEMA IF NOT EXISTS public
-      username: sa
-      password: sa
-      driver-class-name: org.h2.Driver
-
   jpa:
     database: default
     hibernate.ddl-auto: validate
     properties.hibernate.jdbc.lob.non_contextual_creation: true
 
+
+  # Web-Utils Configuration
+  web-utils:
+    data:
+      enabled: true
+      # Jpa Entities Package
+      entities-package: com.grayraccoon.sample.authms.data.postgres.domain
+      persistence-unit: authMs
+
+      # Postgres DataSource
+      datasource:
+        # Connection Properties
+        driver-class-name: org.h2.Driver
+        jdbc-url: jdbc:h2:mem:cloud_db;MODE=PostgreSQL;INIT=CREATE SCHEMA IF NOT EXISTS public
+        username: sa
+        password: sa
+
+    # Security Config
+    security:
+      oauth2-server:
+        enabled: true
+        signing-key: test123
+        security-realm: test realm
+      oauth2-resource:
+        enabled: true
+        local-resource-id: test-resource-id
+        secured-matchers: >
+          /**/authenticated/**,
+          /**/secured/**
+
+
 spring.flyway:
-  url: ${spring.datasource.test.jdbc-url}
-  user: ${spring.datasource.test.username}
-  password: ${spring.datasource.test.password}
+  url: ${spring.web-utils.data.datasource.jdbc-url}
+  user: ${spring.web-utils.data.datasource.username}
+  password: ${spring.web-utils.data.datasource.password}
   baseline-on-migrate: true
   locations: classpath:db/migration,classpath:db/test
-
-security:
-  signing-key: test123
-  security-realm: test realm
-  jwt:
-    local-resource-id: test-resource-id

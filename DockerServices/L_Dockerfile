@@ -1,0 +1,12 @@
+FROM logstash:6.6.1
+MAINTAINER Heriberto Reyes Esparza <hery.chemo@gmail.com>
+
+ENV RABBIT_MQ_HOST=RabbitMQ-Server
+ENV ELASTICSEARCH_HOST=elasticsearchserver
+
+COPY /conf/logstash/config/logstash.yml /usr/share/logstash/config/logstash.yml
+
+# Copy contents of pipeline
+ADD /conf/logstash/pipeline /usr/share/logstash/pipeline
+
+EXPOSE 5000

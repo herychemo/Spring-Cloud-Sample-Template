@@ -1,5 +1,6 @@
 package com.grayraccoon.sample.authms;
 
+import com.grayraccoon.webutils.test.auth.Oauth2Utils;
 import org.flywaydb.core.Flyway;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -18,7 +19,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.grayraccoon.sample.authms.config.AuthUtils.getUserAccessToken;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -33,6 +33,7 @@ public class AuthMsOauth2TokenIT {
     private WebApplicationContext wac;
 
     @Autowired
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     private FilterChainProxy springSecurityFilterChain;
 
     @Autowired
@@ -53,7 +54,7 @@ public class AuthMsOauth2TokenIT {
 
     @Test
     public void getAccessTokenTestSuccess() throws Exception {
-        String access_token = getUserAccessToken(mockMvc, "admin","password");
+        String access_token = Oauth2Utils.getUserAccessToken(mockMvc, "admin","password");
 
         Assert.assertNotNull(access_token);
         Assert.assertNotEquals("", access_token);
@@ -61,7 +62,7 @@ public class AuthMsOauth2TokenIT {
 
     @Test
     public void checkTokenTestSuccess() throws Exception {
-        String access_token = getUserAccessToken(mockMvc, "admin","password");
+        String access_token = Oauth2Utils.getUserAccessToken(mockMvc, "admin","password");
 
         ResultActions result =
                 mockMvc.perform(get("/oauth/check_token")
@@ -80,7 +81,6 @@ public class AuthMsOauth2TokenIT {
                                 Matchers.containsInAnyOrder("read","write","user_info")))
                         .andExpect(jsonPath("$.authorities[*]",
                                 Matchers.containsInAnyOrder("ROLE_ADMIN","ROLE_USER")))
-                        .andExpect(jsonPath("$.active", Matchers.is(true)))
                 ;
 
         String resultString = result.andReturn().getResponse().getContentAsString();

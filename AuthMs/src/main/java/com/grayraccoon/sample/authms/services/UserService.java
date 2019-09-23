@@ -3,11 +3,12 @@ package com.grayraccoon.sample.authms.services;
 import com.grayraccoon.sample.authms.data.postgres.domain.UsersEntity;
 import com.grayraccoon.sample.authdomain.domain.PasswordUpdaterModel;
 import com.grayraccoon.sample.authdomain.domain.Users;
+import com.grayraccoon.webutils.abstracts.BaseUserService;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface UserService {
+public interface UserService extends BaseUserService {
 
     List<Users> findAllUsers();
 

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-C_DIR=D:\\Projects\\Github\\Spring-Cloud-Sample-Template\\DockerServices
-
 option="${1}"
 case ${option} in
     start)
@@ -11,32 +9,28 @@ case ${option} in
         docker pull kibana:6.6.1
         docker pull logstash:6.6.1
 
+        docker build -t grayraccoon/sample-cloud-elasticsearch:latest -f E_Dockerfile .
+        docker build -t grayraccoon/sample-cloud-kibana:latest -f K_Dockerfile .
+        docker build -t grayraccoon/sample-cloud-logstash:latest -f L_Dockerfile .
+
         docker network inspect SpringCloudNetwork &> /dev/null || docker network create SpringCloudNetwork
 
         docker run -p 9200:9200             \
             -p 9300:9300                    \
             --net SpringCloudNetwork        \
             --name elasticsearchserver      \
-            -e "discovery.type=single-node" \
-            -d elasticsearch:6.6.1
+            -d grayraccoon/sample-cloud-elasticsearch:latest
             #-v LOCAL_FOLDER:/usr/share/elasticsearch/data  \
 
         docker run -p 5601:5601             \
             --net SpringCloudNetwork        \
             --name kibanaserver             \
-            -e ELASTICSEARCH_URL=http://tasks.elasticsearchserver:9200      \
-            -e ELASTICSEARCH_HOSTS=http://tasks.elasticsearchserver:9200    \
-            -v "$C_DIR\\conf\\kibana\\config\\kibana.yml:/usr/share/kibana/config/kibana.yml"  \
-            -d kibana:6.6.1
+            -d grayraccoon/sample-cloud-kibana:latest
 
          docker run -p 5000:5000            \
             --net SpringCloudNetwork        \
             --name logstashserver           \
-            -e RABBIT_MQ_HOST=RabbitMQ-Server       \
-            -e ELASTICSEARCH_HOST=elasticsearchserver   \
-            -v "$C_DIR\\conf\\logstash\\config\\logstash.yml:/usr/share/logstash/config/logstash.yml"  \
-            -v "$C_DIR\\conf\\logstash\\pipeline\\:/usr/share/logstash/pipeline/"      \
-            -d -it logstash:6.6.1
+            -d -it grayraccoon/sample-cloud-logstash:latest
 
     ;;
     stop)

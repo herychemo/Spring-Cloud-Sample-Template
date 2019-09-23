@@ -1,5 +1,6 @@
-package com.grayraccoon.sample.authms.services;
+package com.grayraccoon.sample.authms.services.impl;
 
+import com.grayraccoon.sample.authms.services.CustomTokenOperationsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

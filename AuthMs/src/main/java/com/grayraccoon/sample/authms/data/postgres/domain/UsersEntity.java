@@ -1,5 +1,6 @@
 package com.grayraccoon.sample.authms.data.postgres.domain;
 
+import com.grayraccoon.webutils.abstracts.BaseUserDetails;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -7,7 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -25,7 +25,7 @@ import java.util.UUID;
 @ToString
 @EqualsAndHashCode
 @Builder
-public class UsersEntity implements Serializable {
+public class UsersEntity implements BaseUserDetails {
 
     private static final long serialVersionUID = 1L;
 

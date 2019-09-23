@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grayraccoon.sample.authdomain.domain.Users;
 import com.grayraccoon.sample.authms.AuthMsApplication;
 import com.grayraccoon.sample.authms.services.UserService;
+import com.grayraccoon.webutils.test.auth.Oauth2Utils;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,7 +29,6 @@ import javax.servlet.ServletException;
 import java.util.Arrays;
 import java.util.UUID;
 
-import static com.grayraccoon.sample.authms.config.AuthUtils.getOauthTestAuthentication;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -150,7 +150,7 @@ public class UsersWebServiceTests {
                         .build()
         );
 
-        SecurityContextHolder.getContext().setAuthentication(getOauthTestAuthentication());
+        SecurityContextHolder.getContext().setAuthentication(Oauth2Utils.getOauthTestAuthentication());
         mockMvc.perform(get("/ws/authenticated/users/me")
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
@@ -177,7 +177,7 @@ public class UsersWebServiceTests {
                 new RuntimeException(exceptionMessage)
         );
 
-        SecurityContextHolder.getContext().setAuthentication(getOauthTestAuthentication());
+        SecurityContextHolder.getContext().setAuthentication(Oauth2Utils.getOauthTestAuthentication());
         mockMvc.perform(get("/ws/authenticated/users/me")
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
@@ -207,7 +207,7 @@ public class UsersWebServiceTests {
                         .build()
         );
 
-        SecurityContextHolder.getContext().setAuthentication(getOauthTestAuthentication());
+        SecurityContextHolder.getContext().setAuthentication(Oauth2Utils.getOauthTestAuthentication());
         mockMvc.perform(get(String.format("/ws/secured/users/%s", user_userId))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
@@ -234,7 +234,7 @@ public class UsersWebServiceTests {
                 new RuntimeException(exceptionMessage)
         );
 
-        SecurityContextHolder.getContext().setAuthentication(getOauthTestAuthentication());
+        SecurityContextHolder.getContext().setAuthentication(Oauth2Utils.getOauthTestAuthentication());
         mockMvc.perform(get("/ws/secured/users/12345")
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
@@ -276,7 +276,7 @@ public class UsersWebServiceTests {
 
         final String user_req_body_str = mapper.writeValueAsString(userRequestBody);
 
-        SecurityContextHolder.getContext().setAuthentication(getOauthTestAuthentication());
+        SecurityContextHolder.getContext().setAuthentication(Oauth2Utils.getOauthTestAuthentication());
         mockMvc.perform(post("/ws/users")
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .content(user_req_body_str)
@@ -311,7 +311,7 @@ public class UsersWebServiceTests {
         final Users userRequestBody = Users.builder().build();
         final String user_req_body_str = mapper.writeValueAsString(userRequestBody);
 
-        SecurityContextHolder.getContext().setAuthentication(getOauthTestAuthentication());
+        SecurityContextHolder.getContext().setAuthentication(Oauth2Utils.getOauthTestAuthentication());
         mockMvc.perform(post("/ws/users")
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .content(user_req_body_str)

@@ -3,6 +3,7 @@ package com.grayraccoon.sample.accountsms.ws;
 import com.grayraccoon.sample.accountsdomain.domain.Accounts;
 import com.grayraccoon.sample.accountsms.AccountsMsApplication;
 import com.grayraccoon.sample.accountsms.services.AccountService;
+import com.grayraccoon.webutils.test.auth.Oauth2Utils;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,7 +27,6 @@ import javax.servlet.ServletException;
 import java.util.Arrays;
 import java.util.UUID;
 
-import static com.grayraccoon.sample.accountsms.config.AuthUtils.getOauthTestAuthentication;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -138,7 +138,7 @@ public class AccountsWebServiceTests {
                         .build()
         );
 
-        SecurityContextHolder.getContext().setAuthentication(getOauthTestAuthentication());
+        SecurityContextHolder.getContext().setAuthentication(Oauth2Utils.getOauthTestAuthentication());
         mockMvc.perform(get("/ws/authenticated/accounts/me")
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
