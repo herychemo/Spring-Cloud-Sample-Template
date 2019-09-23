@@ -42,5 +42,6 @@ Package-And-Push:
   script:
     #- docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY <<< "$CI_REGISTRY_PASSWORD"
     - docker login -u $CI_REGISTRY_USER -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - mvn $MAVEN_CLI_OPTS package deploy -DskipTests
+    - mvn $MAVEN_CLI_OPTS package -DskipTests
+    - chmod +x ./push_services.sh && ./push_services.sh
     - docker rmi $(docker images -qa -f 'dangling=true')
