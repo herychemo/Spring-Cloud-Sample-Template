@@ -12,6 +12,6 @@ publish_for ./ConfigServer
 publish_for ./EurekaServer
 publish_for ./HystrixDashboard
 publish_for ./SpringAdminServer
-publish_for ./turbine-Server
+publish_for ./turbine-server
 publish_for ./ui-gateway
 publish_for ./ZuulApiProxy
