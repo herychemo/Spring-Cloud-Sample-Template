@@ -15,11 +15,12 @@ services:
       replicas: 1
 
   elasticsearchserver:
-    image: elasticsearch:6.6.1
+    build:
+      context: DockerServices
+      dockerfile: E_Dockerfile
+    image: grayraccoon/sample-cloud-elasticsearch:latest
     container_name: elasticsearchserver
     hostname: elasticsearchserver
-    environment:
-      - "discovery.type=single-node"
     ports:
       - 9200:9200
       - 9300:9300
@@ -27,12 +28,12 @@ services:
       - SpringCloudNetwork
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.role == worker
 
   kibanaserver:
-    image: kibana:6.6.1
+    build:
+      context: DockerServices
+      dockerfile: K_Dockerfile
+    image: grayraccoon/sample-cloud-kibana:latest
     container_name: kibanaserver
     hostname: kibanaserver
     environment:
@@ -40,20 +41,18 @@ services:
       - ELASTICSEARCH_HOSTS=http://tasks.elasticsearchserver:9200
     ports:
       - 5601:5601
-    volumes:
-      - ${PWD}/DockerServices/conf/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:
       - elasticsearchserver
     networks:
       - SpringCloudNetwork
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
 
   logstashserver:
-    image: logstash:6.6.1
+    build:
+      context: DockerServices
+      dockerfile: L_Dockerfile
+    image: grayraccoon/sample-cloud-logstash:latest
     container_name: logstashserver
     hostname: logstashserver
     environment:
@@ -61,9 +60,6 @@ services:
       - ELASTICSEARCH_HOST=tasks.elasticsearchserver
     ports:
       - 5000:5000
-    volumes:
-      - ${PWD}/DockerServices/conf/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - logstash-pipeline:/usr/share/logstash/pipeline
     depends_on:
       - RabbitMQ-Server
       - elasticsearchserver
@@ -71,9 +67,6 @@ services:
       - SpringCloudNetwork
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
 
   ZipkinServer:
     image: openzipkin/zipkin
@@ -91,9 +84,6 @@ services:
       - SpringCloudNetwork
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.role == worker
 
   PostgresDatabase:
     image: postgres:11.2
@@ -109,16 +99,6 @@ services:
       - SpringCloudNetwork
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.role == worker
-
-volumes:
-  logstash-pipeline:
-    driver_opts:
-      type: none
-      device: ${PWD}/DockerServices/conf/logstash/pipeline
-      o: bind
 
 
 networks:

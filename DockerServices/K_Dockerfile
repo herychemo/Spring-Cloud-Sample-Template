@@ -1,0 +1,9 @@
+FROM kibana:6.6.1
+MAINTAINER Heriberto Reyes Esparza <hery.chemo@gmail.com>
+
+ENV ELASTICSEARCH_URL=http://elasticsearchserver:9200
+ENV ELASTICSEARCH_HOSTS=http://elasticsearchserver:9200
+
+COPY /conf/kibana/config/kibana.yml /usr/share/kibana/config/kibana.yml
+
+EXPOSE 5601

@@ -1,5 +1,5 @@
 ## default
-spring.profiles.include: standalone
+eureka.client.enabled: false
 ---
 ## Copy this standalone section on your app bootstrap.yml
 spring.profiles: standalone
@@ -28,12 +28,12 @@ spring.application.name: auth-ms
 logging:
   file: ${java.io.tmpdir}/logs/${spring.application.name}.log
 ---
-spring.profiles: local,standalone,heroku,aws,dev
+spring.profiles: local,standalone,localdev,dockercli,swarm,heroku,aws,dev
 spring.profiles.include: base
 ---
 spring.profiles: local
 spring.profiles.main: local
-spring.profiles.include: standalone
+spring.profiles.include: cloud,cloudlogback
 ---
 spring.profiles: heroku
 spring.profiles.main: heroku
@@ -45,7 +45,7 @@ spring.profiles.include: standalone
 ---
 spring.profiles: localdev
 spring.profiles.main: localdev
-spring.profiles.include: cloud,cloudlogback
+spring.profiles.include: standalone
 ---
 spring.profiles: dockercli
 spring.profiles.main: dockercli
@@ -58,4 +58,3 @@ spring.cloud.config.uri: http://tasks.ConfigServer:8888
 spring.profiles: cloudlogback
 logging:
   config: ${spring.cloud.config.uri}/${spring.cloud.config.name}/${spring.profiles.main:base}/master/logback-spring.xml
-

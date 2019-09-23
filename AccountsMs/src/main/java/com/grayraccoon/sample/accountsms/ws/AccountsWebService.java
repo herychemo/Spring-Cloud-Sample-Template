@@ -5,6 +5,7 @@ import com.grayraccoon.sample.accountsms.services.AccountService;
 import com.grayraccoon.webutils.dto.GenericDto;
 import com.grayraccoon.webutils.errors.ApiError;
 import com.grayraccoon.webutils.exceptions.CustomApiException;
+import com.grayraccoon.webutils.ws.BaseWebService;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,38 +20,27 @@ import java.util.Map;
 import static com.grayraccoon.webutils.config.components.CustomAccessTokenConverter.getExtraInfo;
 
 @RestController
-@RequestMapping("/ws")
-public class AccountsWebService {
+public class AccountsWebService extends BaseWebService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountsWebService.class);
 
     @Autowired
     private AccountService accountService;
 
-    @HystrixCommand(fallbackMethod = "findAllAccountsFallback",
-            commandKey = "FindAllAccounts",
-            groupKey = "Accounts",
-            ignoreExceptions = CustomApiException.class)
+
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/secured/accounts")
-    public GenericDto<List<Accounts>> findAllAccounts() {
+    @HystrixCommand(groupKey = "Accounts", commandKey = "findAllAccounts")
+    public GenericDto<?> findAllAccounts() {
         LOGGER.info("findAllAccounts()");
         final List<Accounts> accounts = accountService.findAllAccounts();
         LOGGER.info("{} accounts found.", accounts.size());
         return GenericDto.<List<Accounts>>builder().data(accounts).build();
     }
 
-    public GenericDto<List<Accounts>> findAllAccountsFallback(Throwable ex) {
-        LOGGER.error("findAllAccountsFallback", ex);
-        throw new CustomApiException(ApiError.builder().throwable(ex).build());
-    }
-
-    @HystrixCommand(fallbackMethod = "findMeFallback",
-            commandKey = "findMe",
-            groupKey = "Accounts",
-            ignoreExceptions = CustomApiException.class)
     @GetMapping("/authenticated/accounts/me")
-    public GenericDto<Accounts> findMe(Authentication authentication) {
+    @HystrixCommand(fallbackMethod = "findMeFallback", groupKey = "Accounts", commandKey = "findMe")
+    public GenericDto<?> findMe(Authentication authentication) {
         Map<String,Object> extraInfo = getExtraInfo(authentication);
         String userId = (String) extraInfo.get("userId");
         LOGGER.info("findMe() {}", userId);
@@ -59,38 +49,33 @@ public class AccountsWebService {
         return GenericDto.<Accounts>builder().data(account).build();
     }
 
-    public GenericDto<Accounts> findMeFallback(Authentication authentication, Throwable ex) {
+    public GenericDto<?> findMeFallback(Authentication authentication, Throwable ex) {
         LOGGER.error("findMeFallback", ex);
         throw new CustomApiException(ApiError.builder().throwable(ex).build());
     }
 
 
-    @HystrixCommand(fallbackMethod = "findAccountFallback",
-            commandKey = "findAccount",
-            groupKey = "Accounts",
-            ignoreExceptions = CustomApiException.class)
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/secured/accounts/{accountId}")
-    public GenericDto<Accounts> findAccount(@PathVariable String accountId) {
+    @HystrixCommand(fallbackMethod = "findAccountFallback", groupKey = "Accounts", commandKey = "findAccount")
+    public GenericDto<?> findAccount(@PathVariable String accountId) {
         LOGGER.info("findAccount() {}", accountId);
         final Accounts account = accountService.findAccountById(accountId);
         LOGGER.info("Account {} Found: {}", accountId, account);
         return GenericDto.<Accounts>builder().data(account).build();
     }
 
-    public GenericDto<Accounts> findAccountFallback(String accountId, Throwable ex) {
+    public GenericDto<?> findAccountFallback(String accountId, Throwable ex) {
         LOGGER.error("findAccountFallback", ex);
         throw new CustomApiException(ApiError.builder().throwable(ex).build());
     }
 
-    @HystrixCommand(fallbackMethod = "updateAccountFallback",
-            commandKey = "updateAccount",
-            groupKey = "Accounts",
-            ignoreExceptions = CustomApiException.class)
+
     @PutMapping("/authenticated/accounts")
-    public GenericDto<Accounts> updateAccount(@RequestBody Accounts accounts, Authentication authentication) {
-        Map<String,Object> extraInfo = getExtraInfo(authentication);
-        String userId = (String) extraInfo.get("userId");
+    @HystrixCommand(fallbackMethod = "updateAccountFallback", groupKey = "Accounts", commandKey = "updateAccount")
+    public GenericDto<?> updateAccount(@RequestBody Accounts accounts, Authentication authentication) {
+        final Map<String,Object> extraInfo = getExtraInfo(authentication);
+        final String userId = (String) extraInfo.get("userId");
 
         LOGGER.info("updateAccount() {}, {}", userId, accounts);
         final Accounts account = accountService.updateAccount(accounts, userId);
@@ -99,19 +84,17 @@ public class AccountsWebService {
     }
 
     @HystrixCommand(ignoreExceptions = CustomApiException.class)
-    public GenericDto<Accounts> updateAccountFallback(Accounts accounts, Authentication authentication, Throwable ex) {
+    public GenericDto<?> updateAccountFallback(Accounts accounts, Authentication authentication, Throwable ex) {
         LOGGER.error("updateAccountFallback", ex);
         throw new CustomApiException(ApiError.builder().throwable(ex).build());
     }
 
 
-    @HystrixCommand(fallbackMethod = "updateAccountAsAdminFallback",
-            commandKey = "updateAccountAsAdmin",
-            groupKey = "Accounts",
-            ignoreExceptions = CustomApiException.class)
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PutMapping("/secured/accounts")
-    public GenericDto<Accounts> updateAccountAsAdmin(@RequestBody Accounts accounts) {
+    @HystrixCommand(fallbackMethod = "updateAccountAsAdminFallback",
+            groupKey = "Accounts", commandKey = "updateAccountAsAdmin")
+    public GenericDto<?> updateAccountAsAdmin(@RequestBody Accounts accounts) {
         LOGGER.info("updateAccountAsAdmin() {}", accounts);
         final Accounts account = accountService.updateAccount(accounts);
         LOGGER.info("Updated Account: {}", account);
@@ -119,7 +102,7 @@ public class AccountsWebService {
     }
 
     @HystrixCommand(ignoreExceptions = CustomApiException.class)
-    public GenericDto<Accounts> updateAccountAsAdminFallback(Accounts accounts, Throwable ex) {
+    public GenericDto<?> updateAccountAsAdminFallback(Accounts accounts, Throwable ex) {
         LOGGER.error("updateAccountFallback", ex);
         throw new CustomApiException(ApiError.builder().throwable(ex).build());
     }

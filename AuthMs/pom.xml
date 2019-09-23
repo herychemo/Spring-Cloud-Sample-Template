@@ -69,6 +69,13 @@
 
 
 		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+
+		<dependency>
 			<groupId>com.grayraccoon.sample</groupId>
 			<artifactId>auth-domain</artifactId>
 			<version>0.1.0-SNAPSHOT</version>

@@ -1,0 +1,7 @@
+FROM elasticsearch:6.6.1
+MAINTAINER Heriberto Reyes Esparza <hery.chemo@gmail.com>
+
+ENV discovery.type=single-node
+
+EXPOSE 9200
+EXPOSE 9300
